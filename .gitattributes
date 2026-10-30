@@ -1,0 +1,86 @@
+# Normalize text to LF for consistent diffs across operating systems.
+* text=auto eol=lf
+
+# Source and configuration files.
+*.cs text diff=csharp
+*.shader text
+*.compute text
+*.cginc text
+*.hlsl text
+*.glsl text
+*.asmdef text
+*.asmref text
+*.json text
+*.xml text
+*.yml text
+*.yaml text
+*.md text
+*.uxml text
+*.uss text
+
+# Unity serialized assets: preserve readable YAML and auto-detect binary assets.
+*.meta text
+*.unity text
+*.prefab text
+*.asset text=auto
+*.mat text
+*.anim text
+*.controller text
+*.overrideController text
+*.playable text
+*.mask text
+*.physicMaterial text
+*.physicsMaterial2D text
+*.renderTexture text
+*.lighting text=auto
+*.terrainlayer text
+*.shadergraph text
+*.shadersubgraph text
+*.vfx text
+
+# Windows command scripts need CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets must not undergo line-ending conversion or text merging.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tga binary
+*.tif binary
+*.tiff binary
+*.psd binary
+*.psb binary
+*.exr binary
+*.hdr binary
+*.ico binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.aif binary
+*.aiff binary
+*.flac binary
+*.mp4 binary
+*.mov binary
+*.webm binary
+*.avi binary
+*.fbx binary
+*.blend binary
+*.unitypackage binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.a binary
+*.lib binary
+*.pdb binary
+*.mdb binary
+*.zip binary
+*.7z binary
+*.gz binary
+*.pdf binary
