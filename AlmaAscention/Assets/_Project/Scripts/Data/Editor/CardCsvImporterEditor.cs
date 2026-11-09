@@ -46,6 +46,9 @@ namespace CNF.Data.Editor
             _potionCsv  = LoadSavedCsv(PrefKeyPotionCsv);
             _monsterCsv = LoadSavedCsv(PrefKeyMonsterCsv);
             _eventCsv   = LoadSavedCsv(PrefKeyEventCsv);
+
+            if (_cardCsv == null)
+                _cardCsv = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Scripts/Data/SampleCards.csv");
         }
 
         private static TextAsset LoadSavedCsv(string prefKey)
@@ -640,9 +643,9 @@ namespace CNF.Data.Editor
                 var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 for (int c = 0; c < Mathf.Min(headers.Count, cols.Count); c++)
                 {
-                    string h = headers[c].Trim();
+                    string h = headers[c].Trim().Trim('\uFEFF');
                     if (!string.IsNullOrEmpty(h))
-                        dict[h] = cols[c].Trim();
+                        dict[h] = cols[c].Trim().Trim('\uFEFF');
                 }
                 result.Add(dict);
             }

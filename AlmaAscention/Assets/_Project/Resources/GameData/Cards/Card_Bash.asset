@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5044664e9fbb742ad57be4bc1b3007, type: 3}
+  m_Name: Card_Bash
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.CardDataSO
+  CustomParams: []
+  CardID: Bash
+  CardName: "\uAC15\uD0C0"
+  UpgradedCardName: "\uAC15\uD0C0+"
+  Description: "\uD53C\uD574\uB97C {D} \uC8FC\uACE0 \uCDE8\uC57D\uC744 {M} \uBD80\uC5EC\uD569\uB2C8\uB2E4."
+  UpgradedDescription: "\uD53C\uD574\uB97C {D} \uC8FC\uACE0 \uCDE8\uC57D\uC744 {M} \uBD80\uC5EC\uD569\uB2C8\uB2E4."
+  CardArt: {fileID: 0}
+  CardType: 0
+  Rarity: 0
+  TargetType: 0
+  BaseCost: 2
+  UpgradedCost: 2
+  IsXCost: 0
+  IsExhaust: 0
+  IsUpgradedExhaust: 0
+  IsEthereal: 0
+  IsRetain: 0
+  IsInnate: 0
+  AnimTriggerName: Attack
+  HitVFXPrefab: {fileID: 0}
+  CastSFX: {fileID: 0}
+  CameraShakeIntensity: 0.2
+  Effects:
+  - rid: 3789391169683456008
+  - rid: 3789391169683456009
+  references:
+    version: 2
+    RefIds:
+    - rid: 3789391169683456008
+      type: {class: DealDamageEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseDamage: 8
+        UpgradedDamage: 10
+        HitCount: 1
+        MultiplyHitsByXCost: 0
+        HitInterval: 0.1
+        RetargetIfTargetDiesMidCombo: 0
+        OverrideTarget: 0
+        PlaceholderTag: '{D}'
+    - rid: 3789391169683456009
+      type: {class: ApplyStatusEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        StatusID: Vulnerable
+        BaseStacks: 2
+        UpgradedStacks: 3
+        RepeatCount: 1
+        HitInterval: 0.08
+        ApplyTo: 0
+        PlaceholderTag: '{M}'

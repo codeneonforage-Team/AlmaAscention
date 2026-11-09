@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5044664e9fbb742ad57be4bc1b3007, type: 3}
+  m_Name: Card_Reaper
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.CardDataSO
+  CustomParams: []
+  CardID: Reaper
+  CardName: "\uC0AC\uC2E0\uC758 \uB0AB"
+  UpgradedCardName: "\uC0AC\uC2E0\uC758 \uB0AB+"
+  Description: "\uBAA8\uB4E0 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C {D} \uC8FC\uACE0 \uB9C9\uD788\uC9C0 \uC54A\uC740 \uD53C\uD574\uB9CC\uD07C \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4. (\uC18C\uBA78)"
+  UpgradedDescription: "\uBAA8\uB4E0 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C {D} \uC8FC\uACE0 \uB9C9\uD788\uC9C0 \uC54A\uC740 \uD53C\uD574\uB9CC\uD07C \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4. (\uC18C\uBA78)"
+  CardArt: {fileID: 0}
+  CardType: 0
+  Rarity: 3
+  TargetType: 1
+  BaseCost: 2
+  UpgradedCost: 2
+  IsXCost: 0
+  IsExhaust: 1
+  IsUpgradedExhaust: 1
+  IsEthereal: 0
+  IsRetain: 0
+  IsInnate: 0
+  AnimTriggerName: Attack
+  HitVFXPrefab: {fileID: 0}
+  CastSFX: {fileID: 0}
+  CameraShakeIntensity: 0.2
+  Effects:
+  - rid: 3789391169683456018
+  - rid: 3789391169683456019
+  references:
+    version: 2
+    RefIds:
+    - rid: 3789391169683456018
+      type: {class: DealDamageEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseDamage: 4
+        UpgradedDamage: 5
+        HitCount: 1
+        MultiplyHitsByXCost: 0
+        HitInterval: 0.1
+        RetargetIfTargetDiesMidCombo: 0
+        OverrideTarget: 1
+        PlaceholderTag: '{D}'
+    - rid: 3789391169683456019
+      type: {class: VampireAoEDamageEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseDamage: 4
+        UpgradedDamage: 5
+        PlaceholderTag: '{D}'

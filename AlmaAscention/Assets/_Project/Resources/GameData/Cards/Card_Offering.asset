@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5044664e9fbb742ad57be4bc1b3007, type: 3}
+  m_Name: Card_Offering
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.CardDataSO
+  CustomParams: []
+  CardID: Offering
+  CardName: "\uBD09\uD5CC"
+  UpgradedCardName: "\uBD09\uD5CC+"
+  Description: "\uCCB4\uB825\uC744 {H} \uC783\uACE0 \uB9C8\uB098 2\uC640 \uCE74\uB4DC {M}\uC7A5\uC744 \uBF51\uC2B5\uB2C8\uB2E4. (\uC18C\uBA78)"
+  UpgradedDescription: "\uCCB4\uB825\uC744 {H} \uC783\uACE0 \uB9C8\uB098 2\uC640 \uCE74\uB4DC {M}\uC7A5\uC744 \uBF51\uC2B5\uB2C8\uB2E4. (\uC18C\uBA78)"
+  CardArt: {fileID: 0}
+  CardType: 1
+  Rarity: 3
+  TargetType: 3
+  BaseCost: 0
+  UpgradedCost: 0
+  IsXCost: 0
+  IsExhaust: 1
+  IsUpgradedExhaust: 1
+  IsEthereal: 0
+  IsRetain: 0
+  IsInnate: 0
+  AnimTriggerName: Attack
+  HitVFXPrefab: {fileID: 0}
+  CastSFX: {fileID: 0}
+  CameraShakeIntensity: 0.2
+  Effects:
+  - rid: 3789391169683456014
+  - rid: 3789391169683456015
+  references:
+    version: 2
+    RefIds:
+    - rid: 3789391169683456014
+      type: {class: DrawAndManaEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseDraw: 3
+        UpgradedDraw: 5
+        BaseManaGain: 2
+        UpgradedManaGain: 2
+        PlaceholderTag: '{M}'
+    - rid: 3789391169683456015
+      type: {class: ModifyHPEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseHPDelta: -6
+        UpgradedHPDelta: -6
+        ApplyTo: 3
+        PlaceholderTag: '{H}'

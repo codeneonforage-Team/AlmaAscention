@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5044664e9fbb742ad57be4bc1b3007, type: 3}
+  m_Name: Card_IronWave
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.CardDataSO
+  CustomParams: []
+  CardID: IronWave
+  CardName: "\uCCA0\uC758 \uD30C\uB3D9"
+  UpgradedCardName: "\uCCA0\uC758 \uD30C\uB3D9+"
+  Description: "\uBC29\uC5B4\uB3C4\uB97C {B} \uC5BB\uACE0 \uD53C\uD574\uB97C {D} \uC90D\uB2C8\uB2E4."
+  UpgradedDescription: "\uBC29\uC5B4\uB3C4\uB97C {B} \uC5BB\uACE0 \uD53C\uD574\uB97C {D} \uC90D\uB2C8\uB2E4."
+  CardArt: {fileID: 0}
+  CardType: 0
+  Rarity: 1
+  TargetType: 0
+  BaseCost: 1
+  UpgradedCost: 1
+  IsXCost: 0
+  IsExhaust: 0
+  IsUpgradedExhaust: 0
+  IsEthereal: 0
+  IsRetain: 0
+  IsInnate: 0
+  AnimTriggerName: Attack
+  HitVFXPrefab: {fileID: 0}
+  CastSFX: {fileID: 0}
+  CameraShakeIntensity: 0.2
+  Effects:
+  - rid: 3789391169683456011
+  - rid: 3789391169683456012
+  references:
+    version: 2
+    RefIds:
+    - rid: 3789391169683456011
+      type: {class: DealDamageEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseDamage: 5
+        UpgradedDamage: 7
+        HitCount: 1
+        MultiplyHitsByXCost: 0
+        HitInterval: 0.1
+        RetargetIfTargetDiesMidCombo: 0
+        OverrideTarget: 0
+        PlaceholderTag: '{D}'
+    - rid: 3789391169683456012
+      type: {class: GainBlockEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        BaseBlock: 5
+        UpgradedBlock: 7
+        MultiplyByXCost: 0
+        PlaceholderTag: '{B}'

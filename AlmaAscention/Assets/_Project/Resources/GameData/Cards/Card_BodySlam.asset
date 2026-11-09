@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5044664e9fbb742ad57be4bc1b3007, type: 3}
+  m_Name: Card_BodySlam
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.CardDataSO
+  CustomParams: []
+  CardID: BodySlam
+  CardName: "\uBCF4\uB514\uC2AC\uB7A8"
+  UpgradedCardName: "\uBCF4\uB514\uC2AC\uB7A8+"
+  Description: "\uD604\uC7AC \uBC29\uC5B4\uB3C4\uB9CC\uD07C \uC801\uC5D0\uAC8C \uD53C\uD574({D})\uB97C \uC90D\uB2C8\uB2E4."
+  UpgradedDescription: "\uD604\uC7AC \uBC29\uC5B4\uB3C4\uB9CC\uD07C \uC801\uC5D0\uAC8C \uD53C\uD574({D})\uB97C \uC90D\uB2C8\uB2E4."
+  CardArt: {fileID: 0}
+  CardType: 0
+  Rarity: 1
+  TargetType: 0
+  BaseCost: 1
+  UpgradedCost: 0
+  IsXCost: 0
+  IsExhaust: 0
+  IsUpgradedExhaust: 0
+  IsEthereal: 0
+  IsRetain: 0
+  IsInnate: 0
+  AnimTriggerName: Attack
+  HitVFXPrefab: {fileID: 0}
+  CastSFX: {fileID: 0}
+  CameraShakeIntensity: 0.2
+  Effects:
+  - rid: 3789391169683456017
+  references:
+    version: 2
+    RefIds:
+    - rid: 3789391169683456017
+      type: {class: BodySlamDamageEffect, ns: CNF.AbilitySystem, asm: Assembly-CSharp}
+      data:
+        PlaceholderTag: '{D}'

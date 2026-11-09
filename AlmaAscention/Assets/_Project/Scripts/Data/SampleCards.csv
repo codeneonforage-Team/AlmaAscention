@@ -1,0 +1,13 @@
+﻿CardID,CardName,UpgradedCardName,CardType,Rarity,TargetType,BaseCost,UpgradedCost,Description,UpgradedDescription,BaseDamage,UpgradedDamage,HitCount,BaseBlock,UpgradedBlock,StatusID,BaseStatusStacks,UpgradedStatusStacks,DrawCount,UpgradedDrawCount,ManaGain,UpgradedManaGain,HealAmount,SelfDamage,UpgradedHPDelta,IsExhaust,IsUpgradedExhaust,IsEthereal,IsRetain,IsInnate,IsXCost,SpecialEffect
+Strike,타격,타격+,Attack,Starter,SingleEnemy,1,1,적에게 피해를 {D} 줍니다.,적에게 피해를 {D} 줍니다.,6,9,1,0,0,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+Defend,수비,수비+,Skill,Starter,Self,1,1,방어도를 {B} 얻습니다.,방어도를 {B} 얻습니다.,0,0,1,5,8,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+Bash,강타,강타+,Attack,Starter,SingleEnemy,2,2,피해를 {D} 주고 취약을 {M} 부여합니다.,피해를 {D} 주고 취약을 {M} 부여합니다.,8,10,1,0,0,Vulnerable,2,3,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+TwinStrike,연속 베기,연속 베기+,Attack,Common,SingleEnemy,1,1,피해를 {D}씩 2번 줍니다.,피해를 {D}씩 2번 줍니다.,5,7,2,0,0,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+IronWave,철의 파동,철의 파동+,Attack,Common,SingleEnemy,1,1,방어도를 {B} 얻고 피해를 {D} 줍니다.,방어도를 {B} 얻고 피해를 {D} 줍니다.,5,7,1,5,7,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+BattleTrance,전투 무아지경,전투 무아지경+,Skill,Uncommon,Self,0,0,카드를 {M}장 뽑습니다.,카드를 {M}장 뽑습니다.,0,0,1,0,0,,,0,3,4,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+Offering,봉헌,봉헌+,Skill,Rare,Self,0,0,체력을 {H} 잃고 마나 2와 카드 {M}장을 뽑습니다. (소멸),체력을 {H} 잃고 마나 2와 카드 {M}장을 뽑습니다. (소멸),0,0,1,0,0,,,0,3,5,2,2,0,6,-6,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,
+Inflame,발화,발화+,Power,Uncommon,Self,1,1,힘을 {M} 얻습니다.,힘을 {M} 얻습니다.,0,0,1,0,0,Strength,2,3,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+BodySlam,보디슬램,보디슬램+,Attack,Common,SingleEnemy,1,0,현재 방어도만큼 적에게 피해({D})를 줍니다.,현재 방어도만큼 적에게 피해({D})를 줍니다.,0,0,1,0,0,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,BodySlam
+Reaper,사신의 낫,사신의 낫+,Attack,Rare,AllEnemies,2,2,모든 적에게 피해를 {D} 주고 막히지 않은 피해만큼 체력을 회복합니다. (소멸),모든 적에게 피해를 {D} 주고 막히지 않은 피해만큼 체력을 회복합니다. (소멸),4,5,1,0,0,,,0,0,0,0,0,0,0,0,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,Reaper
+FiendFire,악마의 불꽃,악마의 불꽃+,Attack,Rare,SingleEnemy,2,2,손패를 모두 소멸시키고 그 장수만큼 피해를 {D}씩 줍니다. (소멸),손패를 모두 소멸시키고 그 장수만큼 피해를 {D}씩 줍니다. (소멸),7,10,1,0,0,,,0,0,0,0,0,0,0,0,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,FiendFire
+Entrench,참호,참호+,Skill,Uncommon,Self,2,1,현재 방어도를 2배로 늘립니다.,현재 방어도를 2배로 늘립니다.,0,0,1,0,0,,,0,0,0,0,0,0,0,0,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,Entrench
