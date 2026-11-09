@@ -43,12 +43,6 @@ namespace CNF.Data
                 }
                 return _cachedData;
             }
-            private set
-            {
-                _cachedData = value;
-                if (value != null && !string.IsNullOrEmpty(value.CardID))
-                    _cardId = value.CardID;
-            }
         }
 
         public event Action<CardInstance> OnCardStateChanged;
@@ -92,11 +86,15 @@ namespace CNF.Data
 
         public bool WillExhaust => Data != null && (_isUpgraded ? Data.IsUpgradedExhaust : Data.IsExhaust);
 
-        public void Upgrade()
+        /// <summary>
+        /// 카드를 강화합니다. 이미 강화된 상태라면 false를, 새로 강화되었다면 true를 반환합니다.
+        /// </summary>
+        public bool Upgrade()
         {
-            if (_isUpgraded) return;
+            if (_isUpgraded) return false;
             _isUpgraded = true;
             OnCardStateChanged?.Invoke(this);
+            return true;
         }
 
         public void SetEnchantment(string enchantmentId)
