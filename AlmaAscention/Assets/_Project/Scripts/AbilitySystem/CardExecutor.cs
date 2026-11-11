@@ -34,6 +34,11 @@ namespace CNF.AbilitySystem
         // 동일 카드에 대해 TriggerCardExhaustPassives를 중복 호출하는 것을 방지하는 일회성 가드 GUID
         private static string _pendingDeckExhaustIgnoreGuid;
 
+        // 악마의 불꽃(ExhaustHandDamageEffect) 시전 시 BattleFlow처럼 시전 카드가 아직 손패에 남아있는 상태에서
+        // ExhaustEntireHand()가 호출되더라도 자기 자신이 타격 횟수에 포함되지 않도록 방어하는 가드
+        private static string _selfExhaustHandCardGuid;
+        private static bool _wasSelfExhaustedDuringHandExhaust;
+
         public bool IsBusy => _isProcessingQueue || _playQueue.Count > 0;
 
         public event Action<CardInstance, CombatContext> OnBeforeCardPlayed;
@@ -52,6 +57,8 @@ namespace CNF.AbilitySystem
             StopAllCoroutines();
             _isProcessingQueue = false;
             _pendingDeckExhaustIgnoreGuid = null;
+            _selfExhaustHandCardGuid = null;
+            _wasSelfExhaustedDuringHandExhaust = false;
         }
 
         public bool CanPlayCard(CardInstance card, CombatContext context, out string failReason)
@@ -237,12 +244,22 @@ namespace CNF.AbilitySystem
         /// </summary>
         public static void TriggerCardExhaustPassives(CardInstance exhaustedCard, CombatContext context)
         {
-            if (exhaustedCard != null &&
-                !string.IsNullOrEmpty(_pendingDeckExhaustIgnoreGuid) &&
-                string.Equals(exhaustedCard.InstanceGUID, _pendingDeckExhaustIgnoreGuid, StringComparison.Ordinal))
+            if (exhaustedCard != null)
             {
-                _pendingDeckExhaustIgnoreGuid = null;
-                return;
+                if (!string.IsNullOrEmpty(_selfExhaustHandCardGuid) &&
+                    string.Equals(exhaustedCard.InstanceGUID, _selfExhaustHandCardGuid, StringComparison.Ordinal))
+                {
+                    _wasSelfExhaustedDuringHandExhaust = true;
+                    _selfExhaustHandCardGuid = null;
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(_pendingDeckExhaustIgnoreGuid) &&
+                    string.Equals(exhaustedCard.InstanceGUID, _pendingDeckExhaustIgnoreGuid, StringComparison.Ordinal))
+                {
+                    _pendingDeckExhaustIgnoreGuid = null;
+                    return;
+                }
             }
 
             if (context.Caster != null && context.Caster.IsAlive)
@@ -257,6 +274,20 @@ namespace CNF.AbilitySystem
             }
 
             CombatEvents.RaiseCardExhausted(exhaustedCard, context.Caster);
+        }
+
+        internal static void BeginSelfExhaustHandGuard(CardInstance castingCard)
+        {
+            _selfExhaustHandCardGuid = castingCard?.InstanceGUID;
+            _wasSelfExhaustedDuringHandExhaust = false;
+        }
+
+        internal static bool EndSelfExhaustHandGuard()
+        {
+            _selfExhaustHandCardGuid = null;
+            bool wasSelfExhausted = _wasSelfExhaustedDuringHandExhaust;
+            _wasSelfExhaustedDuringHandExhaust = false;
+            return wasSelfExhausted;
         }
 
         // =====================================================================

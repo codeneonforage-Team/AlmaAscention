@@ -163,6 +163,44 @@ namespace CNF.Data
         // =====================================================================
 
         /// <summary>
+        /// 기본 시작 덱(타격 5장, 수비 4장, 강타 1장 등) 카드 목록을 Resources/GameData/Cards에서 즉시 구성해 반환합니다.
+        /// 인스펙터에 시작 카드를 일일이 할당하지 않았거나 새 런을 초기화할 때 한 줄로 기본 덱을 세팅할 수 있습니다.
+        /// </summary>
+        public List<CardDataSO> GetDefaultStarterCards(
+            int strikeCount = 5,
+            int defendCount = 4,
+            string specialCardId = "Bash")
+        {
+            var result = new List<CardDataSO>(Mathf.Max(0, strikeCount + defendCount + 1));
+
+            CardDataSO strike = GetCard("Strike");
+            for (int i = 0; i < strikeCount && strike != null; i++)
+                result.Add(strike);
+
+            CardDataSO defend = GetCard("Defend");
+            for (int i = 0; i < defendCount && defend != null; i++)
+                result.Add(defend);
+
+            if (!string.IsNullOrEmpty(specialCardId))
+            {
+                CardDataSO special = GetCard(specialCardId);
+                if (special != null)
+                    result.Add(special);
+            }
+
+            if (result.Count == 0)
+            {
+                foreach (var kvp in _cardDict)
+                {
+                    if (kvp.Value != null && kvp.Value.Rarity == ECardRarity.Starter)
+                        result.Add(kvp.Value);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 전투 보상이나 상점 진열용으로 중복 없는 랜덤 카드 목록을 반환합니다.
         /// 기본값으로 기본 카드(Starter), 특수(Special), 저주(Curse), 상태이상(Status) 카드는 보상 풀에서 자동 제외합니다.
         /// </summary>

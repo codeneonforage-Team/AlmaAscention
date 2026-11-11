@@ -24,10 +24,11 @@ namespace CNF.Data
         public int BonusBlock;
 
         [NonSerialized] private CardDataSO _cachedData;
+        [NonSerialized] internal bool SuppressHandUpgradeCandidate;
 
         public string InstanceGUID => _instanceGuid;
         public string CardID => !string.IsNullOrEmpty(_cardId) ? _cardId : (_cachedData != null ? _cachedData.CardID : string.Empty);
-        public bool IsUpgraded => _isUpgraded;
+        public bool IsUpgraded => _isUpgraded || SuppressHandUpgradeCandidate;
         public string EnchantmentID => _enchantmentId ?? EnchantmentKeys.None;
 
         /// <summary>

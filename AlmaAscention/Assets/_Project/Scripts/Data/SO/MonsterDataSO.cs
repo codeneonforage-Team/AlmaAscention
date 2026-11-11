@@ -92,6 +92,8 @@ namespace CNF.Data
         [Tooltip("비어 있으면 Patterns를 체력 비율 1.0짜리 단일 페이즈로 취급합니다 (기존 에셋 호환 경로).")]
         public List<MonsterPhaseData> Phases = new();
 
+        [NonSerialized] private List<MonsterPhaseData> _fallbackPhaseCache;
+
         // Phases 있으면 그거 그대로 쓰고, 없으면 기존 Patterns를 페이즈 하나로 감싸서 돌려줌.
         // (페이즈 없는 옛날 에셋 호환용임)
         public IReadOnlyList<MonsterPhaseData> GetEffectivePhases()
@@ -99,17 +101,19 @@ namespace CNF.Data
             if (Phases != null && Phases.Count > 0)
                 return Phases;
 
-            return new List<MonsterPhaseData>
+            if (_fallbackPhaseCache == null || _fallbackPhaseCache.Count == 0)
             {
-                new MonsterPhaseData
-                {
-                    PhaseID = "Default",
-                    PhaseName = MonsterName,
-                    HPRatioThreshold = 1.0f,
-                    SelectionMode = EPatternSelectionMode.WeightedRandom,
-                    Patterns = Patterns ?? new List<MonsterSkillPatternData>()
-                }
-            };
+                _fallbackPhaseCache = new List<MonsterPhaseData>(1) { new MonsterPhaseData() };
+            }
+
+            var fallback = _fallbackPhaseCache[0];
+            fallback.PhaseID = "Default";
+            fallback.PhaseName = MonsterName;
+            fallback.HPRatioThreshold = 1.0f;
+            fallback.SelectionMode = EPatternSelectionMode.WeightedRandom;
+            fallback.Patterns = Patterns ??= new List<MonsterSkillPatternData>();
+
+            return _fallbackPhaseCache;
         }
     }
 }

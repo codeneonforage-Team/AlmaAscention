@@ -328,7 +328,20 @@ namespace CNF.AbilitySystem
             rawDmg = GetRawDamage(card);
             exhaustedCount = 0;
             if (context.DeckOps == null || context.PrimaryTarget == null) return false;
-            exhaustedCount = context.DeckOps.ExhaustEntireHand();
+
+            CardExecutor.BeginSelfExhaustHandGuard(card);
+            try
+            {
+                exhaustedCount = context.DeckOps.ExhaustEntireHand();
+            }
+            finally
+            {
+                // BattleFlow처럼 시전 카드가 아직 손패에 남아있던 상태에서 ExhaustEntireHand()가 실행된 경우
+                // 자기 자신(1장)은 타격 횟수에서 제외
+                if (CardExecutor.EndSelfExhaustHandGuard())
+                    exhaustedCount = Mathf.Max(0, exhaustedCount - 1);
+            }
+
             return exhaustedCount > 0;
         }
 
@@ -442,7 +455,18 @@ namespace CNF.AbilitySystem
             if (context.DeckOps == null) return;
             bool isUpgraded = card != null && card.IsUpgraded;
             bool upgradeAll = isUpgraded ? UpgradedUpgradeAll : BaseUpgradeAll;
-            context.DeckOps.UpgradeCardsInHand(upgradeAll);
+
+            // BattleFlow처럼 시전 중인 카드가 아직 손패 목록에 남아있는 경우,
+            // 자기 자신이 강화 후보로 뽑히지 않도록 잠시 후보 제외 플래그 설정
+            if (card != null) card.SuppressHandUpgradeCandidate = true;
+            try
+            {
+                context.DeckOps.UpgradeCardsInHand(upgradeAll);
+            }
+            finally
+            {
+                if (card != null) card.SuppressHandUpgradeCandidate = false;
+            }
         }
     }
 }

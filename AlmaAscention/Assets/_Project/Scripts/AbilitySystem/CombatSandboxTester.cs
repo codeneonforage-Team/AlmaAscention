@@ -60,6 +60,11 @@ namespace CNF.AbilitySystem
         private bool _showCardSpawnerModal;
         private int _pendingTargetCardIndex = -1; // 단일 대상(SingleEnemy) 카드 선택 후 적 클릭 대기 중인 손패 인덱스
 
+        private GUIStyle _richBoxStyle;
+        private GUIStyle _richBtnStyle;
+        private GUIStyle _headerLabelStyle;
+        private static readonly List<string> _statusFormatBuffer = new(16);
+
 #if UNITY_EDITOR
         [MenuItem("CNF/Combat Sandbox/현재 씬에 카드 딜 측정 샌드박스 생성")]
         public static void CreateSandboxInScene()
@@ -571,9 +576,13 @@ namespace CNF.AbilitySystem
             if (_pendingTargetCardIndex >= _hand.Count)
                 _pendingTargetCardIndex = -1;
 
-            GUIStyle richBox = new GUIStyle(GUI.skin.box) { richText = true, fontSize = 13, alignment = TextAnchor.UpperLeft };
-            GUIStyle richBtn = new GUIStyle(GUI.skin.button) { richText = true, fontSize = 12, wordWrap = true };
-            GUIStyle headerLabel = new GUIStyle(GUI.skin.label) { richText = true, fontSize = 15, fontStyle = FontStyle.Bold };
+            _richBoxStyle ??= new GUIStyle(GUI.skin.box) { richText = true, fontSize = 13, alignment = TextAnchor.UpperLeft };
+            _richBtnStyle ??= new GUIStyle(GUI.skin.button) { richText = true, fontSize = 12, wordWrap = true };
+            _headerLabelStyle ??= new GUIStyle(GUI.skin.label) { richText = true, fontSize = 15, fontStyle = FontStyle.Bold };
+
+            GUIStyle richBox = _richBoxStyle;
+            GUIStyle richBtn = _richBtnStyle;
+            GUIStyle headerLabel = _headerLabelStyle;
 
             float w = Screen.width;
             float h = Screen.height;
@@ -819,14 +828,14 @@ namespace CNF.AbilitySystem
             var dict = ctrl.GetAllStatuses();
             if (dict == null || dict.Count == 0) return "<color=#888888>(없음)</color>";
 
-            var parts = new List<string>();
+            _statusFormatBuffer.Clear();
             foreach (var kvp in dict)
             {
                 bool isDebuff = StatusKeys.IsBuiltInDebuff(kvp.Key, kvp.Value) || kvp.Value < 0;
                 string col = isDebuff ? "#FF7777" : "#66FF88";
-                parts.Add($"<color={col}>{kvp.Key}({kvp.Value})</color>");
+                _statusFormatBuffer.Add($"<color={col}>{kvp.Key}({kvp.Value})</color>");
             }
-            return string.Join(", ", parts);
+            return string.Join(", ", _statusFormatBuffer);
         }
     }
 }

@@ -455,6 +455,16 @@ namespace CNF.Data.Editor
                     pat.BlockGain = GetInt(r, $"{prefix}Block", pat.BlockGain);
                     pat.InflictStatusID = GetVal(r, $"{prefix}StatusID", pat.InflictStatusID);
                     pat.StatusStacks = GetInt(r, $"{prefix}StatusStacks", pat.StatusStacks);
+                    pat.ApplyStatusToSelf = GetBool(r, $"{prefix}ApplyToSelf", GetBool(r, $"{prefix}ApplyStatusToSelf", pat.ApplyStatusToSelf));
+                    pat.SummonMonsterID = GetVal(r, $"{prefix}SummonMonsterID", pat.SummonMonsterID);
+                    pat.SelectionWeight = GetFloat(r, $"{prefix}Weight", GetFloat(r, $"{prefix}SelectionWeight", pat.SelectionWeight));
+                    pat.CooldownTurns = GetInt(r, $"{prefix}Cooldown", GetInt(r, $"{prefix}CooldownTurns", pat.CooldownTurns));
+                    pat.MaxConsecutiveUses = GetInt(r, $"{prefix}MaxConsecutive", GetInt(r, $"{prefix}MaxConsecutiveUses", pat.MaxConsecutiveUses));
+                    pat.TurnModulo = GetInt(r, $"{prefix}TurnModulo", pat.TurnModulo);
+                    pat.MaxHPRatioCondition = GetFloat(r, $"{prefix}MaxHPRatio", GetFloat(r, $"{prefix}MaxHPRatioCondition", pat.MaxHPRatioCondition));
+                    pat.IsSpecialPattern = GetBool(r, $"{prefix}IsSpecial", GetBool(r, $"{prefix}IsSpecialPattern", pat.IsSpecialPattern));
+                    pat.SpecialPriority = GetInt(r, $"{prefix}SpecialPriority", pat.SpecialPriority);
+                    pat.AnimTriggerName = GetVal(r, $"{prefix}AnimTrigger", GetVal(r, $"{prefix}AnimTriggerName", pat.AnimTriggerName));
                 }
 
                 SyncExtraParams(so, r, _knownMonsterCols);
@@ -615,10 +625,46 @@ namespace CNF.Data.Editor
                 }
             }
 
+            string[] monsterGuids = AssetDatabase.FindAssets("t:MonsterDataSO");
+            for (int i = 0; i < monsterGuids.Length; i++)
+            {
+                var monster = AssetDatabase.LoadAssetAtPath<MonsterDataSO>(AssetDatabase.GUIDToAssetPath(monsterGuids[i]));
+                if (monster == null) continue;
+
+                var phases = monster.GetEffectivePhases();
+                if (phases == null || phases.Count == 0)
+                {
+                    Debug.LogWarning($"[데이터 검증 경고] 몬스터 '{monster.MonsterID}' ({monster.MonsterName})에 유효한 페이즈가 없습니다.", monster);
+                    warningCount++;
+                    continue;
+                }
+
+                for (int p = 0; p < phases.Count; p++)
+                {
+                    var phase = phases[p];
+                    if (phase == null || phase.Patterns == null || phase.Patterns.Count == 0)
+                    {
+                        Debug.LogWarning($"[데이터 검증 경고] 몬스터 '{monster.MonsterID}' ({monster.MonsterName})의 페이즈 #{p}에 등록된 행동 패턴이 없습니다.", monster);
+                        warningCount++;
+                        continue;
+                    }
+
+                    for (int k = 0; k < phase.Patterns.Count; k++)
+                    {
+                        var pat = phase.Patterns[k];
+                        if (pat != null && !string.IsNullOrEmpty(pat.InflictStatusID) && !validStatusKeys.Contains(pat.InflictStatusID))
+                        {
+                            Debug.LogWarning($"[데이터 검증 경고] 몬스터 '{monster.MonsterID}' 패턴 '{pat.PatternName}'에 등록되지 않은 StatusID '{pat.InflictStatusID}'가 지정되어 있습니다.", monster);
+                            warningCount++;
+                        }
+                    }
+                }
+            }
+
             if (warningCount == 0)
-                Debug.Log($"<color=#44FF66>[CNF 데이터 검증 완료]</color> 총 {cardGuids.Length}개의 CardDataSO 에셋에서 플레이스홀더 및 StatusID 이상이 발견되지 않았습니다!");
+                Debug.Log($"<color=#44FF66>[CNF 데이터 검증 완료]</color> 카드 {cardGuids.Length}개 및 몬스터 {monsterGuids.Length}개 에셋에서 이상이 발견되지 않았습니다!");
             else
-                Debug.LogWarning($"[CNF 데이터 검증 완료] 총 {cardGuids.Length}개 카드 중 {warningCount}건의 확인 필요 항목이 발견되었습니다. (콘솔 메시지 클릭 시 해당 SO로 이동)");
+                Debug.LogWarning($"[CNF 데이터 검증 완료] 총 {warningCount}건의 확인 필요 항목이 발견되었습니다. (콘솔 메시지 클릭 시 해당 SO로 이동)");
         }
 
         /// <summary>
@@ -733,6 +779,9 @@ namespace CNF.Data.Editor
 
         private static int GetInt(Dictionary<string, string> dict, string key, int fallback)
             => dict.TryGetValue(key, out string val) && int.TryParse(val, out int res) ? res : fallback;
+
+        private static float GetFloat(Dictionary<string, string> dict, string key, float fallback)
+            => dict.TryGetValue(key, out string val) && float.TryParse(val, out float res) ? res : fallback;
 
         private static bool GetBool(Dictionary<string, string> dict, string key, bool fallback)
             => dict.TryGetValue(key, out string val) && bool.TryParse(val, out bool res) ? res : fallback;

@@ -66,6 +66,25 @@ namespace CNF.AbilitySystem
             OnManaChanged?.Invoke(_currentMana, _maxMana);
         }
 
+        /// <summary>
+        /// MonsterDataSO의 체력 범위(MinHP~MaxHP)와 초기 방어도(InitialBlock)로 몬스터 스탯을 즉시 초기화합니다.
+        /// (BattleFlow.Setup 호출 전 몬스터 StatusController 세팅용)
+        /// </summary>
+        public void InitializeFromMonsterData(MonsterDataSO data, System.Random random = null)
+        {
+            if (data == null) return;
+            TeamID = 1;
+            int minHp = Mathf.Max(1, data.MinHP);
+            int maxHp = Mathf.Max(minHp, data.MaxHP);
+            int rolledHp = random != null
+                ? random.Next(minHp, maxHp + 1)
+                : UnityEngine.Random.Range(minHp, maxHp + 1);
+
+            InitializeStats(rolledHp, rolledHp, maxMana: 0);
+            if (data.InitialBlock > 0)
+                AddBlock(data.InitialBlock, applyDexterity: false);
+        }
+
         // =====================================================================
         // 상태이상 (Status / Buff / Debuff / Power) 제어
         // =====================================================================
