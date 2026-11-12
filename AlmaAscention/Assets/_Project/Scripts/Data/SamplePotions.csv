@@ -1,0 +1,14 @@
+﻿PotionID,PotionName,Description,Rarity,TargetType,EffectType,ShopPrice,EffectValue,StatusID,StatusStacks
+HealPotion,회복 물약,체력을 20 회복합니다.,Common,Self,Heal,50,20,,0
+BlockPotion,방어 물약,방어도를 12 얻습니다.,Common,Self,Block,50,12,,0
+StrengthPotion,힘의 물약,힘을 2 얻습니다.,Common,Self,BuffStrength,50,0,,2
+DexterityPotion,민첩의 물약,민첩을 2 얻습니다.,Common,Self,BuffDexterity,50,0,,2
+FirePotion,화염 물약,적 하나에게 피해를 20 줍니다.,Common,SingleEnemy,DamageSingle,50,20,,0
+ExplosivePotion,폭발 물약,모든 적에게 피해를 10 줍니다.,Common,AllEnemies,DamageAll,50,10,,0
+WeakPotion,약화 물약,적 하나에게 약화를 3 부여합니다.,Common,SingleEnemy,DebuffWeak,50,0,,3
+FearPotion,공포 물약,적 하나에게 취약을 3 부여합니다.,Common,SingleEnemy,DebuffVulnerable,50,0,,3
+PoisonPotion,독 물약,적 하나에게 중독을 6 부여합니다.,Common,SingleEnemy,DebuffPoison,50,0,,6
+SwiftPotion,신속 물약,카드를 3장 뽑습니다.,Common,Self,DrawCards,50,3,,0
+EnergyPotion,마나 물약,마나를 2 얻습니다.,Uncommon,Self,GainMana,75,2,,0
+FairyPotion,요정 물약,치명상을 입으면 자동으로 사용되어 최대 체력의 30%로 부활합니다.,Rare,Self,Resurrect,100,30,,0
+ArtifactPotion,인공물 물약,인공물을 1 얻습니다.,Rare,Self,Custom,100,0,Artifact,1
