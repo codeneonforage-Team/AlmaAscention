@@ -30,7 +30,6 @@ namespace AlmaAscention.Deck
         public void AddCard(CardInstance card)
         {
             _cards.Add(card);
-            Changed?.Invoke();
         }
 
         // 손패에서 카드를 삭제하고 해당 객체를 반환한다.
@@ -45,7 +44,6 @@ namespace AlmaAscention.Deck
                 if (string.Equals(card.InstanceGUID, instanceGuid, StringComparison.Ordinal))
                 {
                     _cards.RemoveAt(index);
-                    Changed?.Invoke();
 
                     return card;
                 }
@@ -54,7 +52,6 @@ namespace AlmaAscention.Deck
             return null;
         }
 
-        // TODO:: Notify인데 Custom으로 바꿀 수도 있음. 아직 보류.
-        public event Action Changed;
+        // 변경 알림은 소유자인 BattleDeckManager가 일괄 담당한다.
     }
 }

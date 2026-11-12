@@ -67,11 +67,17 @@ namespace AlmaAscention.Deck
                 return 0;
             }
 
-            IReadOnlyList<CardInstance> drawnCards = _battleDeck.Draw(count);
+            IReadOnlyList<CardInstance> drawnCards = _battleDeck.Draw(count, out bool reshuffled);
 
             foreach (CardInstance card in drawnCards)
             {
                 _cardHand.AddCard(card);
+            }
+
+            // 이동을 모두 끝낸 뒤 알린다. (리스너가 덱을 조작해도 상태가 꼬이지 않도록)
+            if (reshuffled)
+            {
+                Reshuffled?.Invoke();
             }
 
             if (drawnCards.Count > 0)
@@ -123,6 +129,23 @@ namespace AlmaAscention.Deck
             return true;
         }
 
+        // 핸드에서 카드를 어느 더미에도 넣지 않고 전투에서 제거함. (예: 사용한 파워 카드)
+        // 소멸이 아니므로 CardExhausted는 발생하지 않는다.
+        // 선조건: instanceGuid는 유효하다.
+        public bool RemoveFromHand(string instanceGuid)
+        {
+            CardInstance card = _cardHand.TakeCardOrNull(instanceGuid);
+
+            if (card == null)
+            {
+                return false;
+            }
+
+            Changed?.Invoke();
+
+            return true;
+        }
+
         // 호출 시점의 손패 전체를 소멸시킨 뒤 실제 소멸한 장수를 반환한다.
         // 소멸 패시브로 새로 뽑은 카드가 이번 소멸에 포함되지 않도록 먼저 이동을 완료한다.
         public int ExhaustEntireHand()
@@ -157,13 +180,12 @@ namespace AlmaAscention.Deck
         }
 
         // 카드 ID로 원본 데이터를 조회하고 전투용 카드를 손패에 생성한다.
+        // 카드 효과용 IDeckOperations 진입점이며, 실제 생성은 CreateTemporaryCardOrNull이 담당한다.
         // 선조건: cardId는 등록된 카드 ID이며 DataManager가 초기화되어 있다.
         public void AddCardToHand(string cardId, bool isUpgraded = false)
         {
             CardDataSO cardData = DataManager.Instance.GetCard(cardId);
-            CardInstance card = new CardInstance(cardData, isUpgraded);
-            _cardHand.AddCard(card);
-            Changed?.Invoke();
+            CreateTemporaryCardOrNull(cardData, CardDestination.Hand, isUpgraded);
         }
 
         // 전투 중 손패의 미강화 카드만 강화한다. 영구 덱에는 반영하지 않는다.
@@ -200,9 +222,10 @@ namespace AlmaAscention.Deck
             Changed?.Invoke();
         }
 
-        // 전투 중 카드를 생성하는 경우.
+        // 전투 중 카드를 생성하는 경우. (임시 카드 생성의 단일 구현)
+        // 강화 상태는 생성 시점에 적용되므로 알림을 받는 쪽은 최종 상태를 본다.
         // 선조건: cardData는 유효하다.
-        public CardInstance CreateTemporaryCardOrNull(CardDataSO cardData, CardDestination destination)
+        public CardInstance CreateTemporaryCardOrNull(CardDataSO cardData, CardDestination destination, bool isUpgraded = false)
         {
             // 카드 생성 전에 목적지부터 검증한다.
             switch (destination)
@@ -219,7 +242,7 @@ namespace AlmaAscention.Deck
                     return null;
             }
 
-            CardInstance card = new CardInstance(cardData);
+            CardInstance card = new CardInstance(cardData, isUpgraded);
 
             switch (destination)
             {
@@ -258,20 +281,13 @@ namespace AlmaAscention.Deck
 
         // TODO:: 연출 시스템 연결 시 처리 순서와 당시 정보를 전달하도록 확장한다.
 
-        // 매니저가 요청받은 작업을 완료한 뒤 알린다.
-        // TODO:: BitFlag를 통해 자신에게 해당하는 패턴만 이벤트 수행 (UI 갱신 등).
-        // 하지만 현재 UI 갱신에 필요한 데이터가 확정되지 않은 상황이라 더 구체화하는 의미가 없음.
-        [Flags]
-        public enum DeckChange
-        {
-            None = 0,
-            Hand = 1,
-            DrawPile = 2,
-            DiscardPile = 4,
-            ExhaustPile = 8
-        }
-
+        // 매니저가 요청받은 작업을 완료한 뒤 알린다. (전투 중 덱·손패 변경의 단일 알림 창구)
+        // TODO:: UI 갱신에 필요한 데이터가 확정되면 변경된 영역(손패/더미)을 인자로 전달하도록 확장.
         public event Action Changed;
+
+        // 드로우 도중 묘지를 섞어 뽑을 더미로 되돌렸을 때, 드로우가 끝난 뒤 한 번 알린다. (Changed보다 먼저 발생)
+        // 수동 Shuffle()에서는 발생하지 않는다. ("셔플 시 발동" 유물, 셔플 연출 연결용)
+        public event Action Reshuffled;
 
         // 소멸 이동 완료 후 전투 쪽에서 패시브와 전역 이벤트를 연결한다.
         // 예: card => CardExecutor.TriggerCardExhaustPassives(card, context)

@@ -4,6 +4,8 @@ using CNF.Data;
 
 namespace AlmaAscention.Deck
 {
+    // 전투 중 더미(뽑을 카드·묘지·소멸)를 보관한다.
+    // 변경 알림은 소유자인 BattleDeckManager가 일괄 담당하므로 이 클래스는 이벤트를 갖지 않는다.
     public sealed class BattleDeck
     {
         // TODO:: 랜덤 시스템
@@ -41,13 +43,18 @@ namespace AlmaAscention.Deck
                 _drawPile.Add(card.Clone());
             }
 
-            // 시작 셔플의 실행 시점은 전투 준비 쪽에서 결정.
+            // 전투 시작 셔플.
+            // TODO:: 선천성(Innate) 카드가 생기면 셔플 후 최상단으로 올리는 처리를 여기에 추가.
+            ShuffleInternal();
         }
 
         // 부족하면 가능한 만큼만 뽑고 종료한다.
-        public IReadOnlyList<CardInstance> Draw(int count)
+        // reshuffled: 드로우 도중 묘지를 섞어 뽑을 더미로 되돌렸는지 여부.
+        // (리필 후에는 묘지가 비므로 한 번의 Draw에서 리필은 최대 1회다.)
+        public IReadOnlyList<CardInstance> Draw(int count, out bool reshuffled)
         {
             List<CardInstance> drawnCards = new List<CardInstance>();
+            reshuffled = false;
 
             for (int index = 0; index < count; index++)
             {
@@ -60,6 +67,7 @@ namespace AlmaAscention.Deck
                     }
 
                     RefillDrawPileInternal();
+                    reshuffled = true;
                 }
 
                 int topIndex = _drawPile.Count - 1;
@@ -69,14 +77,7 @@ namespace AlmaAscention.Deck
                 drawnCards.Add(card);
             }
 
-            // TODO: drawnCards를 CardHand에 전달하는 인터페이스 연결.
-            // 현재는 호출자가 반환된 카드들을 손패에 전달해야 한다.
-
-            if (drawnCards.Count > 0)
-            {
-                Changed?.Invoke();
-            }
-
+            // 호출자가 반환된 카드들을 손패에 전달해야 한다.
             return drawnCards.AsReadOnly();
         }
 
@@ -98,7 +99,6 @@ namespace AlmaAscention.Deck
             }
 
             ShuffleInternal();
-            Changed?.Invoke();
         }
 
         // TODO: 임시 로직임.
@@ -121,7 +121,6 @@ namespace AlmaAscention.Deck
         {
             // 리스트의 마지막 원소가 다음에 뽑힐 카드다.
             _drawPile.Add(card);
-            Changed?.Invoke();
         }
 
         // 카드를 묘지에 추가.
@@ -129,7 +128,6 @@ namespace AlmaAscention.Deck
         public void AddToDiscardPile(CardInstance card)
         {
             _discardPile.Add(card);
-            Changed?.Invoke();
         }
 
         // 카드를 소멸 리스트에 추가.
@@ -137,14 +135,7 @@ namespace AlmaAscention.Deck
         public void AddToExhaustPile(CardInstance card)
         {
             _exhaustPile.Add(card);
-            Changed?.Invoke();
         }
-
-        // TODO: CardHand에서 버림·소멸 더미로 전달하는 인터페이스.
-        // TODO: CardHand에 임시 생성 카드를 추가하는 인터페이스.
-
-        // TODO:: Notify인데 Custom으로 바꿀 수도 있음. 아직 보류.
-        public event Action Changed;
 
         // TODO: 연출 시스템 연결 시 드로우·셔플·카드 이동의
         // 처리 순서와 재생에 필요한 당시 정보를 전달하도록 확장한다.

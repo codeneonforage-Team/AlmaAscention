@@ -205,14 +205,11 @@ namespace AlmaAscention.Deck.Tests
             IReadOnlyList<CardInstance> view = hand.Cards;
             CardInstance card = CreateCard();
             hand.AddCard(card);
-            int notifications = 0;
-            hand.Changed += () => notifications++;
 
             Assert.That(hand.TakeCardOrNull(card.InstanceGUID), Is.SameAs(card));
             Assert.That(view, Is.Empty);
             Assert.That(hand.Count, Is.Zero);
             Assert.That(hand.TakeCardOrNull(card.InstanceGUID), Is.Null);
-            Assert.That(notifications, Is.EqualTo(1));
         }
 
         #endregion
@@ -492,6 +489,41 @@ namespace AlmaAscention.Deck.Tests
             Assert.That(notifications, Is.EqualTo(1));
         }
 
+        [TestCase(TestName = "드로우 중 묘지 리필은 손패 추가가 끝난 뒤 Changed보다 먼저 한 번 알린다 | ManagerDraw_Refill_NotifiesReshuffledOnceAfterMovesBeforeChanged")]
+        public void ManagerDraw_Refill_NotifiesReshuffledOnceAfterMovesBeforeChanged()
+        {
+            BattleDeckManager manager = CreateManager();
+            manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.DrawPileTop);
+            manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.DiscardPile);
+            manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.DiscardPile);
+            List<string> events = new List<string>();
+            int handCountAtReshuffle = -1;
+            manager.Reshuffled += () =>
+            {
+                events.Add("Reshuffled");
+                handCountAtReshuffle = manager.HandCards.Count;
+            };
+            manager.Changed += () => events.Add("Changed");
+
+            Assert.That(manager.Draw(3), Is.EqualTo(3));
+            Assert.That(events, Is.EqualTo(new[] { "Reshuffled", "Changed" }));
+            Assert.That(handCountAtReshuffle, Is.EqualTo(3));
+        }
+
+        [TestCase(TestName = "리필이 없는 드로우와 수동 셔플은 리필 알림을 보내지 않는다 | ManagerDrawAndShuffle_WithoutRefill_DoesNotNotifyReshuffled")]
+        public void ManagerDrawAndShuffle_WithoutRefill_DoesNotNotifyReshuffled()
+        {
+            BattleDeckManager manager = CreateManager(new MasterDeck(Enumerable.Range(0, 3).Select(index => CreateCard())));
+            int reshuffles = 0;
+            manager.Reshuffled += () => reshuffles++;
+
+            manager.Shuffle();
+            Assert.That(manager.Draw(2), Is.EqualTo(2));
+            Assert.That(manager.Draw(5), Is.EqualTo(1));
+
+            Assert.That(reshuffles, Is.Zero);
+        }
+
         [TestCase(TestName = "묘지 일부 재드로우 후에도 모든 카드가 중복이나 누락 없이 남는다 | ManagerDraw_PartialRefill_PreservesEveryCardExactlyOnce")]
         public void ManagerDraw_PartialRefill_PreservesEveryCardExactlyOnce()
         {
@@ -523,6 +555,41 @@ namespace AlmaAscention.Deck.Tests
             Assert.That(notifications, Is.Zero);
         }
 
+        [TestCase(TestName = "손패 제거는 어느 더미에도 넣지 않고 소멸 알림 없이 한 번 알린다 | RemoveFromHand_RemovesWithoutPileOrExhaustNotification")]
+        public void RemoveFromHand_RemovesWithoutPileOrExhaustNotification()
+        {
+            BattleDeckManager manager = CreateManager();
+            CardInstance card = manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.Hand);
+            CardInstance other = manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.Hand);
+            int notifications = 0;
+            int exhaustNotifications = 0;
+            manager.Changed += () => notifications++;
+            manager.CardExhausted += _ => exhaustNotifications++;
+
+            Assert.That(manager.RemoveFromHand(card.InstanceGUID), Is.True);
+            Assert.That(manager.RemoveFromHand(card.InstanceGUID), Is.False);
+
+            Assert.That(manager.HandCards.Single(), Is.SameAs(other));
+            Assert.That(manager.DrawPile, Is.Empty);
+            Assert.That(manager.DiscardPile, Is.Empty);
+            Assert.That(manager.ExhaustPile, Is.Empty);
+            Assert.That(notifications, Is.EqualTo(1));
+            Assert.That(exhaustNotifications, Is.Zero);
+        }
+
+        [TestCase(TestName = "강화 상태로 생성한 임시 카드는 알림 시점에 이미 강화되어 있다 | TemporaryCard_Upgraded_IsUpgradedBeforeNotification")]
+        public void TemporaryCard_Upgraded_IsUpgradedBeforeNotification()
+        {
+            BattleDeckManager manager = CreateManager();
+            bool? upgradedAtNotification = null;
+            manager.Changed += () => upgradedAtNotification = manager.DiscardPile.Single().IsUpgraded;
+
+            CardInstance card = manager.CreateTemporaryCardOrNull(CreateData(), BattleDeckManager.CardDestination.DiscardPile, true);
+
+            Assert.That(card.IsUpgraded, Is.True);
+            Assert.That(upgradedAtNotification, Is.True);
+        }
+
         [TestCase(TestName = "같은 시드의 셔플은 순서를 재현하고 다른 더미는 유지한다 | ManagerShuffle_SameSeed_ReproducesOrderAndPreservesOtherPiles")]
         public void ManagerShuffle_SameSeed_ReproducesOrderAndPreservesOtherPiles()
         {
@@ -543,6 +610,20 @@ namespace AlmaAscention.Deck.Tests
             Assert.That(first.DiscardPile.Single(), Is.SameAs(discarded));
             Assert.That(first.ExhaustPile.Single(), Is.SameAs(exhausted));
             Assert.That(notifications, Is.EqualTo(1));
+        }
+
+        [TestCase(TestName = "전투 덱은 생성 시 시드에 따라 섞이며 카드는 누락 없이 유지된다 | Constructor_ShufflesWithSeed_PreservesAllCards")]
+        public void Constructor_ShufflesWithSeed_PreservesAllCards()
+        {
+            MasterDeck master = new MasterDeck(Enumerable.Range(0, 20).Select(index => CreateCard("card_" + index)));
+            BattleDeckManager first = CreateManager(master);
+            BattleDeckManager second = CreateManager(master);
+
+            IEnumerable<string> masterOrder = master.Cards.Select(card => card.CardID);
+
+            Assert.That(first.DrawPile.Select(card => card.CardID), Is.EquivalentTo(masterOrder));
+            Assert.That(first.DrawPile.Select(card => card.CardID), Is.Not.EqualTo(masterOrder));
+            Assert.That(first.DrawPile.Select(card => card.CardID), Is.EqualTo(second.DrawPile.Select(card => card.CardID)));
         }
 
         [TestCase(0, TestName = "두 장 미만의 덱은 셔플 알림을 보내지 않는다 [0] | ManagerShuffle_FewerThanTwoCards_DoesNotNotify")]
