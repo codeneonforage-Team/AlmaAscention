@@ -66,7 +66,8 @@ namespace CNF.Data
         OnCardPlayed,
         OnCardExhausted,
         OnDamaged,
-        OnBattleWin
+        OnBattleWin,
+        OnDeckReshuffled
     }
 
     public enum EPotionRarity

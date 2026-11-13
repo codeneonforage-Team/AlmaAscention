@@ -223,14 +223,19 @@ namespace CNF.AbilitySystem
         {
             ExecuteEnchantmentEffects(card, context);
 
-            bool shouldExhaust = card.WillExhaust || card.Data.CardType == ECardType.Power;
+            bool isPower = card.Data != null && card.Data.CardType == ECardType.Power;
+            bool shouldExhaust = card.WillExhaust || isPower;
 
-            if (shouldExhaust && card.Data.CardType != ECardType.Power)
+            if (shouldExhaust)
             {
                 _pendingDeckExhaustIgnoreGuid = null;
-                TriggerCardExhaustPassives(card, context);
+                if (!isPower)
+                {
+                    TriggerCardExhaustPassives(card, context);
+                }
                 // OnAfterCardPlayed 직후 BattleDeckManager.ExhaustFromHand가 호출되어
-                // CardExhausted 이벤트가 다시 발생하더라도 동일 카드가 중복 발동되지 않도록 일회성 가드 설정
+                // CardExhausted 이벤트가 다시 발생하더라도 동일 카드가 중복 발동되거나
+                // 파워 카드(소멸이 아닌 전투 제거)에서 소멸 패시브가 잘못 터지지 않도록 일회성 가드 설정
                 _pendingDeckExhaustIgnoreGuid = card.InstanceGUID;
             }
 
@@ -319,6 +324,22 @@ namespace CNF.AbilitySystem
                 return false;
             }
 
+            if (potion.EffectType == EPotionEffectType.DrawCards && context.DeckOps == null)
+            {
+                failReason = "드로우를 처리할 덱 매니저가 연결되지 않았습니다.";
+                return false;
+            }
+
+            if (potion.EffectType == EPotionEffectType.Custom)
+            {
+                int stacks = potion.StatusStacks != 0 ? potion.StatusStacks : potion.EffectValue;
+                if (string.IsNullOrEmpty(potion.StatusID) || stacks == 0)
+                {
+                    failReason = "유효한 상태이상 효과가 설정되지 않은 포션입니다.";
+                    return false;
+                }
+            }
+
             bool needsAliveEnemy = potion.TargetType == ECardTarget.SingleEnemy
                                 || potion.TargetType == ECardTarget.AllEnemies
                                 || potion.TargetType == ECardTarget.RandomEnemy
@@ -371,20 +392,16 @@ namespace CNF.AbilitySystem
                     return true;
 
                 case EPotionEffectType.DamageAll:
-                    DealFixedDamageToAllEnemies(context, potion.EffectValue);
-                    return true;
+                    return DealFixedDamageToAllEnemies(context, potion.EffectValue);
 
                 case EPotionEffectType.DebuffWeak:
-                    ApplyStatusByTargetType(StatusKeys.Weak, stacks, potion.TargetType, context);
-                    return true;
+                    return ApplyStatusByTargetType(StatusKeys.Weak, stacks, potion.TargetType, context);
 
                 case EPotionEffectType.DebuffVulnerable:
-                    ApplyStatusByTargetType(StatusKeys.Vulnerable, stacks, potion.TargetType, context);
-                    return true;
+                    return ApplyStatusByTargetType(StatusKeys.Vulnerable, stacks, potion.TargetType, context);
 
                 case EPotionEffectType.DebuffPoison:
-                    ApplyStatusByTargetType(StatusKeys.Poison, stacks, potion.TargetType, context);
-                    return true;
+                    return ApplyStatusByTargetType(StatusKeys.Poison, stacks, potion.TargetType, context);
 
                 case EPotionEffectType.DrawCards:
                     if (context.DeckOps == null) return false;
@@ -397,10 +414,7 @@ namespace CNF.AbilitySystem
 
                 case EPotionEffectType.Custom:
                     if (!string.IsNullOrEmpty(potion.StatusID) && stacks != 0)
-                    {
-                        ApplyStatusByTargetType(potion.StatusID, stacks, potion.TargetType, context);
-                        return true;
-                    }
+                        return ApplyStatusByTargetType(potion.StatusID, stacks, potion.TargetType, context);
                     return false;
 
                 default:
@@ -471,8 +485,8 @@ namespace CNF.AbilitySystem
                         ? ECardTarget.RandomEnemy
                         : (targetSingleEnemy ? ECardTarget.SingleEnemy : ECardTarget.Self));
 
-                ApplyStatusByTargetType(relicData.StatusID, stacks, targetMode, context);
-                executed = true;
+                if (ApplyStatusByTargetType(relicData.StatusID, stacks, targetMode, context))
+                    executed = true;
             }
 
             if (!string.IsNullOrEmpty(effectKey) && relicData.EffectValue != 0)
@@ -500,18 +514,37 @@ namespace CNF.AbilitySystem
                 }
                 else if (string.Equals(effectKey, "DamageAll", StringComparison.OrdinalIgnoreCase))
                 {
-                    DealFixedDamageToAllEnemies(context, relicData.EffectValue);
-                    executed = true;
+                    if (DealFixedDamageToAllEnemies(context, relicData.EffectValue))
+                        executed = true;
+                }
+                else if (string.Equals(effectKey, "DamageSingle", StringComparison.OrdinalIgnoreCase))
+                {
+                    StatusController singleEnemy = ResolveSingleEnemy(context);
+                    if (singleEnemy != null && relicData.EffectValue > 0)
+                    {
+                        singleEnemy.TakeDamage(relicData.EffectValue, caster);
+                        executed = true;
+                    }
+                }
+                else if (string.Equals(effectKey, "DamageRandom", StringComparison.OrdinalIgnoreCase))
+                {
+                    var picked = context.GetValidTargets(ECardTarget.RandomEnemy, _randomTargetPickBuffer);
+                    StatusController randomEnemy = picked.Count > 0 ? picked[0] : null;
+                    if (randomEnemy != null && relicData.EffectValue > 0)
+                    {
+                        randomEnemy.TakeDamage(relicData.EffectValue, caster);
+                        executed = true;
+                    }
                 }
                 else if (string.Equals(effectKey, "ApplyWeakAll", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(relicData.StatusID))
                 {
-                    ApplyStatusByTargetType(StatusKeys.Weak, stacks, ECardTarget.AllEnemies, context);
-                    executed = true;
+                    if (ApplyStatusByTargetType(StatusKeys.Weak, stacks, ECardTarget.AllEnemies, context))
+                        executed = true;
                 }
                 else if (string.Equals(effectKey, "ApplyVulnerableAll", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(relicData.StatusID))
                 {
-                    ApplyStatusByTargetType(StatusKeys.Vulnerable, stacks, ECardTarget.AllEnemies, context);
-                    executed = true;
+                    if (ApplyStatusByTargetType(StatusKeys.Vulnerable, stacks, ECardTarget.AllEnemies, context))
+                        executed = true;
                 }
             }
 
@@ -525,55 +558,78 @@ namespace CNF.AbilitySystem
                 : context.GetFirstAliveEnemy();
         }
 
-        private static void DealFixedDamageToAllEnemies(CombatContext context, int damage)
+        private static bool DealFixedDamageToAllEnemies(CombatContext context, int damage)
         {
-            if (damage <= 0 || context.AllEnemies == null) return;
+            if (damage <= 0 || context.AllEnemies == null) return false;
+            bool hitAny = false;
             for (int i = 0; i < context.AllEnemies.Count; i++)
             {
                 var enemy = context.AllEnemies[i];
                 if (enemy != null && enemy.IsAlive)
+                {
                     enemy.TakeDamage(damage, context.Caster);
+                    hitAny = true;
+                }
             }
+            return hitAny;
         }
 
         private static readonly List<StatusController> _randomTargetPickBuffer = new(1);
 
-        private static void ApplyStatusByTargetType(
+        private static bool ApplyStatusByTargetType(
             string statusId,
             int stacks,
             ECardTarget targetType,
             CombatContext context)
         {
-            if (string.IsNullOrEmpty(statusId) || stacks == 0) return;
+            if (string.IsNullOrEmpty(statusId) || stacks == 0) return false;
 
             switch (targetType)
             {
                 case ECardTarget.None:
                 case ECardTarget.Self:
-                    context.Caster?.AddStatus(statusId, stacks);
-                    break;
+                    if (context.Caster != null && context.Caster.IsAlive)
+                    {
+                        context.Caster.AddStatus(statusId, stacks);
+                        return true;
+                    }
+                    return false;
 
                 case ECardTarget.SingleEnemy:
-                    ResolveSingleEnemy(context)?.AddStatus(statusId, stacks);
-                    break;
+                    StatusController singleEnemy = ResolveSingleEnemy(context);
+                    if (singleEnemy != null)
+                    {
+                        singleEnemy.AddStatus(statusId, stacks);
+                        return true;
+                    }
+                    return false;
 
                 case ECardTarget.AllEnemies:
-                    if (context.AllEnemies != null)
+                    if (context.AllEnemies == null) return false;
+                    bool appliedAny = false;
+                    for (int i = 0; i < context.AllEnemies.Count; i++)
                     {
-                        for (int i = 0; i < context.AllEnemies.Count; i++)
+                        var enemy = context.AllEnemies[i];
+                        if (enemy != null && enemy.IsAlive)
                         {
-                            var enemy = context.AllEnemies[i];
-                            if (enemy != null && enemy.IsAlive)
-                                enemy.AddStatus(statusId, stacks);
+                            enemy.AddStatus(statusId, stacks);
+                            appliedAny = true;
                         }
                     }
-                    break;
+                    return appliedAny;
 
                 case ECardTarget.RandomEnemy:
                     var picked = context.GetValidTargets(ECardTarget.RandomEnemy, _randomTargetPickBuffer);
                     StatusController randomEnemy = picked.Count > 0 ? picked[0] : null;
-                    randomEnemy?.AddStatus(statusId, stacks);
-                    break;
+                    if (randomEnemy != null)
+                    {
+                        randomEnemy.AddStatus(statusId, stacks);
+                        return true;
+                    }
+                    return false;
+
+                default:
+                    return false;
             }
         }
 
