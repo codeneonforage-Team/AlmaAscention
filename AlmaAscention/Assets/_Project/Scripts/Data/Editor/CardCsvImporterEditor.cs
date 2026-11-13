@@ -286,7 +286,8 @@ namespace CNF.Data.Editor
 
         private static readonly HashSet<string> _knownEventCols = new(StringComparer.OrdinalIgnoreCase)
         {
-            "RowName", "Name", "ID", "EventID", "EventTitle", "Title", "EventBodyText", "BodyText", "MinStage", "MaxStage"
+            "RowName", "Name", "ID", "EventID", "EventTitle", "Title", "EventBodyText", "BodyText", "MinStage", "MaxStage",
+            "IsUnfavorableEvent", "AllowAuthorityBypass"
         };
 
         /// <summary>
@@ -493,6 +494,7 @@ namespace CNF.Data.Editor
                 so.EventBodyText = GetVal(r, "EventBodyText", GetVal(r, "BodyText", so.EventBodyText));
                 so.MinStage = GetInt(r, "MinStage", so.MinStage);
                 so.MaxStage = GetInt(r, "MaxStage", so.MaxStage);
+                so.IsUnfavorableEvent = GetBool(r, "IsUnfavorableEvent", GetBool(r, "AllowAuthorityBypass", so.IsUnfavorableEvent));
 
                 // CSV에 Choice1~4 컬럼이 존재할 경우 비파괴 방식으로 이벤트 선택지 자동 매핑
                 for (int cIdx = 1; cIdx <= 4; cIdx++)

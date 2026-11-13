@@ -47,9 +47,11 @@ namespace CNF.Data
         [TextArea(3, 6)] public string EventBodyText;
         public Sprite EventIllustration;
 
-        [Header("2. 출현 조건")]
+        [Header("2. 출현 조건 및 권능(재선) 연동")]
         public int MinStage = 1;
         public int MaxStage = 3;
+        [Tooltip("불리한(위험/패널티) 이벤트인지 여부. true면 '재선' 권능 보유 시 아무 대가 없이 통과할 수 있습니다.")]
+        public bool IsUnfavorableEvent = false;
 
         [Header("3. 선택지 목록")]
         public List<EventChoiceData> Choices = new();

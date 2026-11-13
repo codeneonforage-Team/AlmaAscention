@@ -202,14 +202,18 @@ namespace CNF.Data
 
         /// <summary>
         /// 전투 보상이나 상점 진열용으로 중복 없는 랜덤 카드 목록을 반환합니다.
-        /// 기본값으로 기본 카드(Starter), 특수(Special), 저주(Curse), 상태이상(Status) 카드는 보상 풀에서 자동 제외합니다.
+        /// • 기본값으로 기본 카드(Starter), 특수(Special), 저주(Curse), 상태이상(Status) 카드는 보상 풀에서 자동 제외합니다.
+        /// • [재첨(카드 리롤) 권능 연동]: excludeCardIds에 직전 제시된 카드 ID들을 넘기면 리롤 시 동일 카드가 재등장하는 것을 우선 배제합니다.
         /// </summary>
         public List<CardDataSO> GetRandomCards(
             int count,
             ECardRarity? rarityFilter = null,
-            bool excludeNonRewardCards = true)
+            bool excludeNonRewardCards = true,
+            ICollection<string> excludeCardIds = null)
         {
             var candidates = new List<CardDataSO>();
+            var fallbackExcluded = excludeCardIds != null ? new List<CardDataSO>() : null;
+
             foreach (var kvp in _cardDict)
             {
                 var c = kvp.Value;
@@ -226,16 +230,34 @@ namespace CNF.Data
                 if (rarityFilter.HasValue && c.Rarity != rarityFilter.Value)
                     continue;
 
+                if (excludeCardIds != null && excludeCardIds.Contains(c.CardID))
+                {
+                    fallbackExcluded.Add(c);
+                    continue;
+                }
+
                 candidates.Add(c);
             }
 
-            var picked = new List<CardDataSO>(Mathf.Min(count, candidates.Count));
+            var picked = new List<CardDataSO>(Mathf.Min(count, candidates.Count + (fallbackExcluded?.Count ?? 0)));
             for (int i = 0; i < count && candidates.Count > 0; i++)
             {
                 int idx = UnityEngine.Random.Range(0, candidates.Count);
                 picked.Add(candidates[idx]);
                 candidates.RemoveAt(idx);
             }
+
+            // 만약 제외 목록 때문에 요청 장수(count)를 다 채우지 못했다면, 부족한 만큼만 제외 목록에서 보충
+            if (picked.Count < count && fallbackExcluded != null)
+            {
+                while (picked.Count < count && fallbackExcluded.Count > 0)
+                {
+                    int idx = UnityEngine.Random.Range(0, fallbackExcluded.Count);
+                    picked.Add(fallbackExcluded[idx]);
+                    fallbackExcluded.RemoveAt(idx);
+                }
+            }
+
             return picked;
         }
 
@@ -273,6 +295,42 @@ namespace CNF.Data
                 result.Add(m);
             }
             return result;
+        }
+
+        /// <summary>
+        /// [재물(일반 몬스터 리롤) 권능 연동용]: 엘리트 및 보스 몬스터는 리롤 대상에서 자동 차단하며,
+        /// 현재 일반 몬스터(currentMonsterId)를 제외한 동일 스테이지의 다른 일반(Normal) 몬스터 1종을 랜덤 반환합니다.
+        /// </summary>
+        public MonsterDataSO GetRandomMonsterForReroll(int stage, string currentMonsterId = null, System.Random customRandom = null)
+        {
+            if (!string.IsNullOrEmpty(currentMonsterId))
+            {
+                MonsterDataSO current = GetMonster(currentMonsterId);
+                if (current != null && current.Grade != EMonsterGrade.Normal)
+                    return null;
+            }
+
+            List<MonsterDataSO> normalPool = GetMonstersByStage(stage, EMonsterGrade.Normal);
+            if (normalPool.Count == 0) return null;
+
+            var candidates = new List<MonsterDataSO>(normalPool.Count);
+            for (int i = 0; i < normalPool.Count; i++)
+            {
+                var m = normalPool[i];
+                if (m == null) continue;
+                if (!string.IsNullOrEmpty(currentMonsterId) &&
+                    string.Equals(m.MonsterID, currentMonsterId, StringComparison.OrdinalIgnoreCase))
+                    continue;
+                candidates.Add(m);
+            }
+
+            if (candidates.Count == 0)
+                candidates = normalPool;
+
+            int idx = customRandom != null
+                ? customRandom.Next(candidates.Count)
+                : UnityEngine.Random.Range(0, candidates.Count);
+            return candidates[idx];
         }
 
         /// <summary>

@@ -6,6 +6,38 @@ using CNF.Data;
 namespace CNF.AbilitySystem
 {
     /// <summary>
+    /// 턴 되감기(재회/Regain 권능 등)를 위해 특정 시점의 캐릭터 체력, 방어도, 마나, 생존 여부 및 모든 버프/디버프 스택을 통째로 보존하는 런타임 스냅샷.
+    /// </summary>
+    public readonly struct StatusSnapshot
+    {
+        public readonly int CurrentHP;
+        public readonly int MaxHP;
+        public readonly int CurrentMana;
+        public readonly int MaxMana;
+        public readonly int Block;
+        public readonly bool IsDeathHandled;
+        public readonly Dictionary<string, int> Statuses;
+
+        public StatusSnapshot(
+            int currentHP,
+            int maxHP,
+            int currentMana,
+            int maxMana,
+            int block,
+            bool isDeathHandled,
+            Dictionary<string, int> statuses)
+        {
+            CurrentHP = currentHP;
+            MaxHP = maxHP;
+            CurrentMana = currentMana;
+            MaxMana = maxMana;
+            Block = block;
+            IsDeathHandled = isDeathHandled;
+            Statuses = statuses;
+        }
+    }
+
+    /// <summary>
     /// 언리얼의 UCNF_AttributeSet + UAbilitySystemComponent를 대체하는 핵심 전투 스탯/상태이상 컴포넌트.
     /// • 가시(Thorns) 반사 피해, 바리케이드(Barricade)/잔상(Blur) 방어도 유지, 금속화(Metallicize)/의식(Ritual)을 기본 내장합니다.
     /// • GC(가비지 컬렉션) 할당이 0이며 전역 CombatEvents 버스와 자동 연동됩니다.
@@ -83,6 +115,50 @@ namespace CNF.AbilitySystem
             InitializeStats(rolledHp, rolledHp, maxMana: 0);
             if (data.InitialBlock > 0)
                 AddBlock(data.InitialBlock, applyDexterity: false);
+        }
+
+        /// <summary>
+        /// [재회(턴 되감기) 권능 연동용]: 현재 시점의 체력, 방어도, 마나, 생존 상태 및 모든 상태이상(Dictionary)을 깊은 복사해 스냅샷으로 반환합니다.
+        /// </summary>
+        public StatusSnapshot CaptureSnapshot()
+        {
+            return new StatusSnapshot(
+                _currentHP,
+                _maxHP,
+                _currentMana,
+                _maxMana,
+                _block,
+                _isDeathHandled,
+                new Dictionary<string, int>(_statuses, StringComparer.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// [재회(턴 되감기) 권능 연동용]: 저장해 둔 스냅샷 시점으로 캐릭터의 모든 스탯과 버프/디버프 상태를 즉시 복원합니다.
+        /// </summary>
+        public void RestoreSnapshot(StatusSnapshot snapshot)
+        {
+            _maxHP = Mathf.Max(1, snapshot.MaxHP);
+            _currentHP = Mathf.Clamp(snapshot.CurrentHP, 0, _maxHP);
+            _maxMana = snapshot.MaxMana;
+            _currentMana = snapshot.CurrentMana;
+            _block = Mathf.Max(0, snapshot.Block);
+            _isDeathHandled = snapshot.IsDeathHandled;
+
+            _statuses.Clear();
+            if (snapshot.Statuses != null)
+            {
+                foreach (var kvp in snapshot.Statuses)
+                {
+                    if (!string.IsNullOrEmpty(kvp.Key) && kvp.Value != 0)
+                        _statuses[kvp.Key] = kvp.Value;
+                }
+            }
+
+            OnHPChanged?.Invoke(_currentHP, _maxHP);
+            OnBlockChanged?.Invoke(_block);
+            OnManaChanged?.Invoke(_currentMana, _maxMana);
+            OnAnyStatusChanged?.Invoke();
+            SyncPlayerHPIfNeeded();
         }
 
         // =====================================================================
