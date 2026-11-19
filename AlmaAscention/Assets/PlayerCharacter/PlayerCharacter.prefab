@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 971dd751005bbb244b8151e032da5a78, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7b1702b967fa86441a0c69b62433c4e6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -102,6 +102,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4946827710577505234}
   - component: {fileID: 7523193426508699056}
+  - component: {fileID: 4825487446273968140}
   m_Layer: 0
   m_Name: PlayerCharacter
   m_TagString: Untagged
@@ -139,3 +140,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterController
   moveSpeed: 3
   visual: {fileID: 3275259232160999840}
+--- !u!114 &4825487446273968140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3450919893811410541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c253af5ac0019f4baddf0122d0b7f1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterAnimation
+  spriteRenderer: {fileID: 238360866476469590}
+  idleSprite: {fileID: 21300000, guid: 7b1702b967fa86441a0c69b62433c4e6, type: 3}
+  walkFrames:
+  - {fileID: 1658954376, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: 309616253, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: -1207696435, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: -988932631, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: -144076656, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: 1075917462, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: 1943442802, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  - {fileID: -1389797709, guid: c65ab09b809aa81438a7d4c1fe9766ac, type: 3}
+  framesPerSecond: 12
+  referenceMoveSpeed: 3
+  spriteFacesRight: 0

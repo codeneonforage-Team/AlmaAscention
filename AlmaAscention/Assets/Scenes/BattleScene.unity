@@ -1275,7 +1275,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SimpleBattleScene
   font: {fileID: 11400000, guid: 408c7d0a567fe1f448012c1dc82272d1, type: 2}
   backgroundArt: {fileID: 21300000, guid: f45b4366564457a4bb46c7d764b44292, type: 3}
-  playerArt: {fileID: 21300000, guid: 971dd751005bbb244b8151e032da5a78, type: 3}
+  playerArt: {fileID: 21300000, guid: 7b1702b967fa86441a0c69b62433c4e6, type: 3}
+  enemyArt: {fileID: 21300000, guid: 971dd751005bbb244b8151e032da5a78, type: 3}
   startingCards:
   - {fileID: 11400000, guid: 75095c6917f0061469e5873eb7212b50, type: 2}
   - {fileID: 11400000, guid: 75095c6917f0061469e5873eb7212b50, type: 2}
@@ -1288,6 +1289,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 57a6ab4e92db4b24582a92be4e70ff7f, type: 2}
   - {fileID: 11400000, guid: a3014d60a0bf0624fa652d60c6c3f032, type: 2}
   cardUI: {fileID: 844748945}
+  routePrefab: {fileID: 294002275793709186, guid: ce7fd984694cd05478d8a8824e7ab9fc, type: 3}
 --- !u!4 &2139381387
 Transform:
   m_ObjectHideFlags: 0

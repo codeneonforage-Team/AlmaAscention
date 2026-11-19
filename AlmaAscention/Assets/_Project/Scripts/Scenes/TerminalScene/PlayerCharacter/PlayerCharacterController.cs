@@ -6,12 +6,11 @@ public sealed class PlayerCharacterController : MonoBehaviour
 {
     [SerializeField, Min(0)] private float moveSpeed = 3f;
     [SerializeField] private Transform visual;
-    private Vector3 visualOrigin;
-    private float walkTime;
+    private PlayerCharacterAnimation spriteAnimation;
 
     private void Awake()
     {
-        if (visual != null) visualOrigin = visual.localPosition;
+        spriteAnimation = GetComponent<PlayerCharacterAnimation>();
     }
 
     private void Update()
@@ -29,6 +28,7 @@ public sealed class PlayerCharacterController : MonoBehaviour
     public void Move(Vector2 input, float deltaTime)
     {
         Vector2 position = transform.position;
+        Vector2 previousPosition = position;
         Vector2 step = Vector2.ClampMagnitude(input, 1) * (moveSpeed * Mathf.Max(0, deltaTime));
         // Axis-separated movement slides along the edges of the painted walkway.
         var next = position + new Vector2(step.x, 0);
@@ -36,11 +36,7 @@ public sealed class PlayerCharacterController : MonoBehaviour
         next = position + new Vector2(0, step.y);
         if (IsWalkable(next)) position = next;
         transform.position = new Vector3(position.x, position.y, 0);
-        if (visual == null) return;
-        bool walking = step.sqrMagnitude > 0;
-        walkTime = walking ? walkTime + deltaTime * 12 : 0;
-        visual.localPosition = visualOrigin + Vector3.up * (walking ? Mathf.Abs(Mathf.Sin(walkTime)) * .045f : 0);
-        if (input.x != 0) visual.localScale = new Vector3(Mathf.Sign(input.x), 1, 1);
+        if (spriteAnimation != null) spriteAnimation.SetMovement(position - previousPosition, deltaTime);
     }
 
     public static bool IsWalkable(Vector2 p)
