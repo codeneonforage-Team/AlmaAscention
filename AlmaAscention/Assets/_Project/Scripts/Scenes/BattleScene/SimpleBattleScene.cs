@@ -17,11 +17,10 @@ public sealed class SimpleBattleScene : MonoBehaviour
     private MonsterDataSO monster;
     private TMP_Text header, playerInfo, enemyInfo, message, piles;
     private UnityEngine.UI.Button endTurn, back;
-    private readonly List<UnityEngine.UI.Button> cardButtons = new();
-    private readonly List<TMP_Text> cardLabels = new();
+    [SerializeField] private CardHandUI cardUI;
     private readonly List<CardInstance> visibleCards = new();
     private RectTransform canvasRoot;
-    private string log = "카드를 클릭해 사용하세요. 방어도로 적의 공격을 막을 수 있습니다.";
+    private string log = "손패의 카드를 위쪽 전투 영역으로 드래그해 사용하세요.";
 
     private void Start()
     {
@@ -43,7 +42,11 @@ public sealed class SimpleBattleScene : MonoBehaviour
     public bool PlayCard(int index)
     {
         if(Flow==null || Flow.CardExecutor.IsBusy || index<0 || index>=visibleCards.Count) return false;
-        var card=visibleCards[index];
+        return PlayCard(visibleCards[index]);
+    }
+    public bool PlayCard(CardInstance card)
+    {
+        if (cardUI == null || !cardUI.CanUse(card)) return false;
         if(!Flow.CardExecutor.CanPlayCard(card,new CombatContext {Caster=Flow.Player,PrimaryTarget=Enemy},out string reason)) {log=reason;return false;}
         return Flow.TryPlayCard(card,Enemy);
     }
@@ -58,12 +61,8 @@ public sealed class SimpleBattleScene : MonoBehaviour
         piles.text=$"뽑을 카드 {Flow.DeckManager.DrawPile.Count}     버린 카드 {Flow.DeckManager.DiscardPile.Count}     소멸 {Flow.DeckManager.ExhaustPile.Count}";
         visibleCards.Clear();visibleCards.AddRange(Flow.DeckManager.HandCards);
         var ctx=new CombatContext {Caster=Flow.Player,PrimaryTarget=Enemy,AllEnemies=new[]{Enemy},DeckOps=Flow.DeckManager};
-        for(int i=0;i<cardButtons.Count;i++) {
-            bool show=i<visibleCards.Count;cardButtons[i].gameObject.SetActive(show);if(!show)continue;
-            var card=visibleCards[i];cardLabels[i].text=$"<size=27>마나 {card.CurrentCost}</size>\n\n<b>{card.DisplayName}</b>\n\n<size=25>{card.GetDynamicDescription(ctx)}</size>";
-            cardButtons[i].interactable=!finished && Flow.State==EBattleState.PlayerTurn && !Flow.CardExecutor.IsBusy && Flow.Player.HasEnoughMana(card.CurrentCost);
-        }
-        endTurn.interactable=Flow.CanEndTurn;back.gameObject.SetActive(finished);
+        cardUI.Refresh(ctx);
+        endTurn.interactable=Flow.CanEndTurn && !cardUI.IsDragging;back.gameObject.SetActive(finished);
     }
     private GameObject Box(string name, Transform parent, Vector2 center, Vector2 size, Color color)
     {
@@ -94,8 +93,8 @@ public sealed class SimpleBattleScene : MonoBehaviour
         playerInfo=Text(Box("PlayerInfo",canvasRoot,new Vector2(-520,-150),new Vector2(570,140),new Color(.035f,.025f,.07f,.9f)),"",30);
         enemyInfo=Text(Box("EnemyInfo",canvasRoot,new Vector2(520,-150),new Vector2(570,140),new Color(.035f,.025f,.07f,.9f)),"",30);
         message=Text(Box("BattleLog",canvasRoot,new Vector2(0,340),new Vector2(1700,75),new Color(.035f,.025f,.07f,.85f)),"",27);
-        piles=Text(Box("Piles",canvasRoot,new Vector2(-170,-485),new Vector2(1200,60),Color.clear),"",25);
-        for(int i=0;i<5;i++){int slot=i;var b=Button("Card"+i,new Vector2(-640+i*280,-340),new Vector2(258,240),"",()=>PlayCard(slot),out var label);cardButtons.Add(b);cardLabels.Add(label);}
+        piles=Text(Box("Piles",canvasRoot,new Vector2(0,260),new Vector2(1200,60),Color.clear),"",25);
+        cardUI.Initialize(this);
         endTurn=Button("EndTurn",new Vector2(780,-485),new Vector2(270,70),"턴 종료",()=>Flow.TryEndPlayerTurn(),out _);
         back=Button("Return",new Vector2(0,80),new Vector2(380,90),"터미널로 돌아가기",()=>SceneFadeTransition.Go("TerminalScene"),out _);back.gameObject.SetActive(false);
     }
