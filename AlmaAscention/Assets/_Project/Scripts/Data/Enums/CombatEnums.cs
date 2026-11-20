@@ -67,7 +67,10 @@ namespace CNF.Data
         OnCardExhausted,
         OnDamaged,
         OnBattleWin,
-        OnDeckReshuffled
+        OnDeckReshuffled,
+        OnEnemyKilled,
+        OnManaDepleted,
+        OnHandEmptied
     }
 
     public enum EPotionRarity
@@ -143,11 +146,29 @@ namespace CNF.Data
         public const string LoseStrengthAtTurnEnd  = "LoseStrengthAtTurnEnd";  // 임시 힘 만료 (턴 종료 시 스택만큼 힘 감소)
         public const string LoseDexterityAtTurnEnd = "LoseDexterityAtTurnEnd"; // 임시 민첩 만료 (턴 종료 시 스택만큼 민첩 감소)
 
+        // 신규 유물 기획(10~35번) 연동용 특수 상태이상/패시브 키
+        public const string GrowingPoison            = "GrowingPoison";            // 독을 머금은 단검(19번): 턴 종료 시 고정 피해 후 스택 1 감소 대신 1 증가
+        public const string VulnerableDoubleDamage   = "VulnerableDoubleDamage";   // 용혈 귀걸이(17번): 취약 상태 적에게 주는 피해 배율 1.5배 -> 2.0배
+        public const string FullHpDoubleDamage       = "FullHpDoubleDamage";       // 고기 호빵(21번): 공격자 풀피(CurrentHP == MaxHP) 유지 시 공격 피해 2배
+        public const string RepeatIntentDoubleDamage = "RepeatIntentDoubleDamage"; // 재액의 단안경(14번): 적이 이미 했던 행동을 반복 중일 때 공격 피해 2배
+        public const string RepeatActionMark         = "RepeatActionMark";         // 재액의 단안경(14번): 현재 중복 행동을 예고한 적 개체에게 부여되는 표식
+        public const string PoisonTargetTripleDamage = "PoisonTargetTripleDamage"; // 녹슨 단검(23번): 독 상태의 적에게 주는 피해 3배
+        public const string DispelTargetOnAttack     = "DispelTargetOnAttack";     // 만념단모(29번): 공격 적중 시 대상의 모든 버프/디버프/회피 상태 해제
+        public const string InflictWeakVulnOnAttack  = "InflictWeakVulnOnAttack";  // 퀴클로노미콘(30번): 공격 적중 시 대상에게 취약과 약화 부여
+        public const string KyklonomiconCurse        = "KyklonomiconCurse";        // 퀴클로노미콘(30번): 4턴 내 미처치 시 턴 종료마다 최대체력 10 감소 카운터
+
+        // 추후 세부 효과 확정 시 StatusBehaviorSO 또는 StatusController에 연결할 예약 상태이상 키
+        public const string Whirlwind                = "Whirlwind";                // 금으로 도금된 클로(35번): [회오리] 상태 (예약 키)
+        public const string Evasion                  = "Evasion";                  // 만념단모(29번) 등에서 참조하는 [회피] 상태 (예약 키)
+
         public static readonly string[] AllBuiltInKeys = new[]
         {
             Strength, Dexterity, Vulnerable, Weak, Frail, Poison, Burn, Mark, Shock, Stunned,
             Artifact, Thorns, Barricade, Blur, Metallicize, Ritual, FeelNoPain, DarkEmbrace,
-            LoseStrengthAtTurnEnd, LoseDexterityAtTurnEnd
+            LoseStrengthAtTurnEnd, LoseDexterityAtTurnEnd,
+            GrowingPoison, VulnerableDoubleDamage, FullHpDoubleDamage, RepeatIntentDoubleDamage, RepeatActionMark,
+            PoisonTargetTripleDamage, DispelTargetOnAttack, InflictWeakVulnOnAttack, KyklonomiconCurse,
+            Whirlwind, Evasion
         };
 
         /// <summary>
@@ -173,10 +194,12 @@ namespace CNF.Data
                 || string.Equals(statusId, Weak, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(statusId, Frail, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(statusId, Poison, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statusId, GrowingPoison, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(statusId, Burn, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(statusId, Mark, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(statusId, Shock, StringComparison.OrdinalIgnoreCase)
-                || string.Equals(statusId, Stunned, StringComparison.OrdinalIgnoreCase);
+                || string.Equals(statusId, Stunned, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(statusId, Whirlwind, StringComparison.OrdinalIgnoreCase);
         }
     }
 

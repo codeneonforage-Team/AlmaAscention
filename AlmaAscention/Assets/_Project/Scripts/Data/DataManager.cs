@@ -204,12 +204,14 @@ namespace CNF.Data
         /// 전투 보상이나 상점 진열용으로 중복 없는 랜덤 카드 목록을 반환합니다.
         /// • 기본값으로 기본 카드(Starter), 특수(Special), 저주(Curse), 상태이상(Status) 카드는 보상 풀에서 자동 제외합니다.
         /// • [재첨(카드 리롤) 권능 연동]: excludeCardIds에 직전 제시된 카드 ID들을 넘기면 리롤 시 동일 카드가 재등장하는 것을 우선 배제합니다.
+        /// • [13번 황금색 깃털 유물 연동]: rareWeightMultiplier에 1보다 큰 값(예: 2.5f)을 넘기면 희귀(Rare) 카드의 등장 확률이 비례하여 높아집니다.
         /// </summary>
         public List<CardDataSO> GetRandomCards(
             int count,
             ECardRarity? rarityFilter = null,
             bool excludeNonRewardCards = true,
-            ICollection<string> excludeCardIds = null)
+            ICollection<string> excludeCardIds = null,
+            float rareWeightMultiplier = 1f)
         {
             var candidates = new List<CardDataSO>();
             var fallbackExcluded = excludeCardIds != null ? new List<CardDataSO>() : null;
@@ -240,25 +242,57 @@ namespace CNF.Data
             }
 
             var picked = new List<CardDataSO>(Mathf.Min(count, candidates.Count + (fallbackExcluded?.Count ?? 0)));
-            for (int i = 0; i < count && candidates.Count > 0; i++)
-            {
-                int idx = UnityEngine.Random.Range(0, candidates.Count);
-                picked.Add(candidates[idx]);
-                candidates.RemoveAt(idx);
-            }
+            PickWeightedCards(candidates, count, rareWeightMultiplier, picked);
 
             // 만약 제외 목록 때문에 요청 장수(count)를 다 채우지 못했다면, 부족한 만큼만 제외 목록에서 보충
             if (picked.Count < count && fallbackExcluded != null)
             {
-                while (picked.Count < count && fallbackExcluded.Count > 0)
-                {
-                    int idx = UnityEngine.Random.Range(0, fallbackExcluded.Count);
-                    picked.Add(fallbackExcluded[idx]);
-                    fallbackExcluded.RemoveAt(idx);
-                }
+                PickWeightedCards(fallbackExcluded, count - picked.Count, rareWeightMultiplier, picked);
             }
 
             return picked;
+        }
+
+        private static void PickWeightedCards(
+            List<CardDataSO> pool,
+            int countToPick,
+            float rareWeightMultiplier,
+            List<CardDataSO> destination)
+        {
+            float clampedRareMult = Mathf.Max(0.1f, rareWeightMultiplier);
+
+            for (int i = 0; i < countToPick && pool.Count > 0; i++)
+            {
+                if (Mathf.Approximately(clampedRareMult, 1f))
+                {
+                    int idx = UnityEngine.Random.Range(0, pool.Count);
+                    destination.Add(pool[idx]);
+                    pool.RemoveAt(idx);
+                    continue;
+                }
+
+                float totalWeight = 0f;
+                for (int k = 0; k < pool.Count; k++)
+                {
+                    totalWeight += pool[k].Rarity == ECardRarity.Rare ? clampedRareMult : 1f;
+                }
+
+                float roll = UnityEngine.Random.Range(0f, totalWeight);
+                int chosenIndex = pool.Count - 1;
+                for (int k = 0; k < pool.Count; k++)
+                {
+                    float w = pool[k].Rarity == ECardRarity.Rare ? clampedRareMult : 1f;
+                    if (roll <= w)
+                    {
+                        chosenIndex = k;
+                        break;
+                    }
+                    roll -= w;
+                }
+
+                destination.Add(pool[chosenIndex]);
+                pool.RemoveAt(chosenIndex);
+            }
         }
 
         /// <summary>

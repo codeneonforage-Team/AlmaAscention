@@ -33,9 +33,11 @@ namespace CNF.Data
         public int AcquireHealBonus = 0;
         public int AcquireGoldBonus = 0;
 
-        [Header("4. 시한부 유물 & 성유물 합성(Fusion) 데이터")]
+        [Header("4. 시한부 유물 & 전투 쿨타임 & 성유물 합성(Fusion) 데이터")]
         public bool IsTimedRelic = false;
         public int TimedDurationFloors = 0;
+        [Tooltip("한 번 발동한 뒤 다시 발동하기까지 필요한 전투 횟수 쿨타임 (0이면 쿨타임 없음, 예: 전기밥솥=6, 팔괘로장갑=12, 양칭저울=5)")]
+        public int CooldownBattles = 0;
         public bool IsRecipeExclusive = false;          // 합성 전용 유물 여부 (일반 드랍 제외)
         public List<string> FusionIngredientIDs = new(); // 조합식이 있는 경우 재료 유물 ID 3개
     }

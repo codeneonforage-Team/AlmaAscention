@@ -23,6 +23,10 @@ namespace CNF.Data
         public int BonusDamage;
         public int BonusBlock;
 
+        // 과부하(Overload) 기믹 유물 연동용 (10번 휴대용 용광로 / 12번 증기 티포트)
+        public bool IsOverloaded;
+        public int OverloadCostReduction;
+
         [NonSerialized] private CardDataSO _cachedData;
         [NonSerialized] internal bool SuppressHandUpgradeCandidate;
 
@@ -81,7 +85,10 @@ namespace CNF.Data
             {
                 if (TempCostOverride >= 0) return TempCostOverride;
                 if (Data == null || IsXCost) return 0;
-                return _isUpgraded ? Data.UpgradedCost : Data.BaseCost;
+                int cost = _isUpgraded ? Data.UpgradedCost : Data.BaseCost;
+                if (IsOverloaded && OverloadCostReduction > 0)
+                    cost = Mathf.Max(0, cost - OverloadCostReduction);
+                return cost;
             }
         }
 
@@ -117,7 +124,9 @@ namespace CNF.Data
                 _cardId = this.CardID,
                 TempCostOverride = this.TempCostOverride,
                 BonusDamage = this.BonusDamage,
-                BonusBlock = this.BonusBlock
+                BonusBlock = this.BonusBlock,
+                IsOverloaded = this.IsOverloaded,
+                OverloadCostReduction = this.OverloadCostReduction
             };
         }
 

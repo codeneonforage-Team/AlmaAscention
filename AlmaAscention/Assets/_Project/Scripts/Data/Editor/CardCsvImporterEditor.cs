@@ -270,7 +270,7 @@ namespace CNF.Data.Editor
             "RowName", "Name", "ID", "RelicID", "RelicName", "Description", "FlavorText",
             "Rarity", "TriggerType", "ShopPrice", "EffectKey", "EffectValue", "StatusID", "StatusStacks",
             "AcquireMaxHealthBonus", "AcquireHealBonus", "AcquireGoldBonus",
-            "IsTimedRelic", "TimedDurationFloors", "IsRecipeExclusive", "FusionIngredients", "FusionIngredientIDs"
+            "IsTimedRelic", "TimedDurationFloors", "CooldownBattles", "IsRecipeExclusive", "FusionIngredients", "FusionIngredientIDs"
         };
 
         private static readonly HashSet<string> _knownPotionCols = new(StringComparer.OrdinalIgnoreCase)
@@ -356,6 +356,7 @@ namespace CNF.Data.Editor
                 so.AcquireGoldBonus = GetInt(r, "AcquireGoldBonus", so.AcquireGoldBonus);
                 so.IsTimedRelic = GetBool(r, "IsTimedRelic", so.IsTimedRelic);
                 so.TimedDurationFloors = GetInt(r, "TimedDurationFloors", so.TimedDurationFloors);
+                so.CooldownBattles = GetInt(r, "CooldownBattles", so.CooldownBattles);
                 so.IsRecipeExclusive = GetBool(r, "IsRecipeExclusive", so.IsRecipeExclusive);
 
                 string rawIngredients = GetVal(r, "FusionIngredients", GetVal(r, "FusionIngredientIDs", ""));

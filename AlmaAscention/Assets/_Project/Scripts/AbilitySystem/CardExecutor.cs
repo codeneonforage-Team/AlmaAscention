@@ -470,51 +470,37 @@ namespace CNF.AbilitySystem
             string effectKey = relicData.EffectKey ?? string.Empty;
             int stacks = relicData.StatusStacks != 0 ? relicData.StatusStacks : relicData.EffectValue;
 
-            if (!string.IsNullOrEmpty(relicData.StatusID) && stacks != 0)
+            if (!string.IsNullOrEmpty(effectKey))
             {
-                bool targetAllEnemies = effectKey.IndexOf("All", StringComparison.OrdinalIgnoreCase) >= 0;
-                bool targetRandomEnemy = !targetAllEnemies &&
-                    effectKey.IndexOf("Random", StringComparison.OrdinalIgnoreCase) >= 0;
-                bool targetSingleEnemy = !targetAllEnemies && !targetRandomEnemy &&
-                    (effectKey.IndexOf("Enemy", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                     effectKey.IndexOf("Target", StringComparison.OrdinalIgnoreCase) >= 0);
-
-                ECardTarget targetMode = targetAllEnemies
-                    ? ECardTarget.AllEnemies
-                    : (targetRandomEnemy
-                        ? ECardTarget.RandomEnemy
-                        : (targetSingleEnemy ? ECardTarget.SingleEnemy : ECardTarget.Self));
-
-                if (ApplyStatusByTargetType(relicData.StatusID, stacks, targetMode, context))
-                    executed = true;
-            }
-
-            if (!string.IsNullOrEmpty(effectKey) && relicData.EffectValue != 0)
-            {
-                if (string.Equals(effectKey, "GainBlock", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(effectKey, "GainBlock", StringComparison.OrdinalIgnoreCase) && relicData.EffectValue > 0)
                 {
                     caster.AddBlock(relicData.EffectValue, applyDexterity: false);
                     executed = true;
                 }
-                else if (string.Equals(effectKey, "Heal", StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(effectKey, "HealOnWin", StringComparison.OrdinalIgnoreCase))
+                else if ((string.Equals(effectKey, "Heal", StringComparison.OrdinalIgnoreCase) ||
+                          string.Equals(effectKey, "HealOnWin", StringComparison.OrdinalIgnoreCase)) &&
+                         relicData.EffectValue > 0)
                 {
                     caster.Heal(relicData.EffectValue);
                     executed = true;
                 }
-                else if (string.Equals(effectKey, "GainMana", StringComparison.OrdinalIgnoreCase))
+                else if (string.Equals(effectKey, "GainMana", StringComparison.OrdinalIgnoreCase) && relicData.EffectValue != 0)
                 {
                     caster.GainMana(relicData.EffectValue);
                     executed = true;
                 }
-                else if (string.Equals(effectKey, "DrawCards", StringComparison.OrdinalIgnoreCase) && context.DeckOps != null)
+                else if (string.Equals(effectKey, "DrawCards", StringComparison.OrdinalIgnoreCase) &&
+                         relicData.EffectValue > 0 && context.DeckOps != null)
                 {
                     context.DeckOps.DrawCards(relicData.EffectValue);
                     executed = true;
                 }
-                else if (string.Equals(effectKey, "DamageAll", StringComparison.OrdinalIgnoreCase))
+                else if (string.Equals(effectKey, "DamageAll", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "BrokenTachi", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "EightTrigramsGlove", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (DealFixedDamageToAllEnemies(context, relicData.EffectValue))
+                    int dmg = relicData.EffectValue > 0 ? relicData.EffectValue : 15;
+                    if (DealFixedDamageToAllEnemies(context, dmg))
                         executed = true;
                 }
                 else if (string.Equals(effectKey, "DamageSingle", StringComparison.OrdinalIgnoreCase))
@@ -536,19 +522,166 @@ namespace CNF.AbilitySystem
                         executed = true;
                     }
                 }
-                else if (string.Equals(effectKey, "ApplyWeakAll", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(relicData.StatusID))
+                else if (string.Equals(effectKey, "ApplyWeakAll", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (ApplyStatusByTargetType(StatusKeys.Weak, stacks, ECardTarget.AllEnemies, context))
+                    int weakStacks = stacks > 0 ? stacks : 1;
+                    if (ApplyStatusByTargetType(StatusKeys.Weak, weakStacks, ECardTarget.AllEnemies, context))
                         executed = true;
                 }
-                else if (string.Equals(effectKey, "ApplyVulnerableAll", StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(relicData.StatusID))
+                else if (string.Equals(effectKey, "ApplyVulnerableAll", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "ApplyVulnerableOtherEnemies", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "SmallestGuitar", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (ApplyStatusByTargetType(StatusKeys.Vulnerable, stacks, ECardTarget.AllEnemies, context))
+                    int vulnStacks = stacks > 0 ? stacks : 1;
+                    if (ApplyStatusByTargetType(StatusKeys.Vulnerable, vulnStacks, ECardTarget.AllEnemies, context))
                         executed = true;
+                }
+                else if (string.Equals(effectKey, "HeavenlyTalisman", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "ApplyWeakAndVulnerableSingle", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 24번 천명 부적: 전투 시작 시 적 하나에게 약화와 취약을 동시에 부여
+                    int debuffStacks = stacks > 0 ? stacks : 1;
+                    StatusController targetEnemy = ResolveSingleEnemy(context);
+                    if (targetEnemy != null)
+                    {
+                        targetEnemy.AddStatus(StatusKeys.Weak, debuffStacks);
+                        targetEnemy.AddStatus(StatusKeys.Vulnerable, debuffStacks);
+                        executed = true;
+                    }
+                }
+                else if (string.Equals(effectKey, "PoisonDagger", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "ApplyGrowingPoison", StringComparison.OrdinalIgnoreCase))
+                {
+                    int poisonStacks = stacks > 0 ? stacks : 2;
+                    string poisonKey = !string.IsNullOrEmpty(relicData.StatusID) ? relicData.StatusID : StatusKeys.GrowingPoison;
+                    if (ApplyStatusByTargetType(poisonKey, poisonStacks, ECardTarget.SingleEnemy, context))
+                        executed = true;
+                }
+                else if (string.Equals(effectKey, "DragonBloodEarring", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "VulnerableDoubleDamage", StringComparison.OrdinalIgnoreCase))
+                {
+                    caster.AddStatus(StatusKeys.VulnerableDoubleDamage, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "MeatBun", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "FullHpDoubleDamage", StringComparison.OrdinalIgnoreCase))
+                {
+                    caster.AddStatus(StatusKeys.FullHpDoubleDamage, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "CalamityMonocle", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "RepeatIntentDoubleDamage", StringComparison.OrdinalIgnoreCase))
+                {
+                    caster.AddStatus(StatusKeys.RepeatIntentDoubleDamage, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "RustedDagger", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "PoisonTargetTripleDamage", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 23번 녹슨 단검: 독 상태의 적에게 3배 데미지
+                    caster.AddStatus(StatusKeys.PoisonTargetTripleDamage, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "Bannendanhoko", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "DispelTargetOnAttack", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 29번 만념단모: 공격한 적의 모든 버프/디버프/회피 상태 해제
+                    caster.AddStatus(StatusKeys.DispelTargetOnAttack, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "ElectricRiceCooker", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "ExecuteLowHpEnemies", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 25번 전기밥솥: 턴 종료 시 적의 체력이 N%(기본 10%) 미만일 시 즉시 처치
+                    if (TryExecuteLowHpEnemies(context, relicData.EffectValue > 0 ? relicData.EffectValue : 10))
+                        executed = true;
+                }
+                else if (string.Equals(effectKey, "SilverBalanceScale", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "EqualizeAllFieldHP", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 27번 잿빛 은 양칭저울: 플레이어 체력이 N%(기본 10%) 미만이 될 시 필드 모든 개체의 체력을 합산 후 균등 분배
+                    if (TryEqualizeFieldHPWhenLow(context, relicData.EffectValue > 0 ? relicData.EffectValue : 10))
+                        executed = true;
+                }
+                else if (string.Equals(effectKey, "Kyklonomicon", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 30번 퀴클로노미콘: 적 체력 반토막 + 자신 체력 50% 회복 + 공격 시 취약/약화 부여 + 4턴 내 미처치 시 최대체력 10씩 감소
+                    ExecuteKyklonomiconStart(context);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "InflictStatusEvery3Hits", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "GoldenKanabo", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "GoldenBambooCannon", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "GoldenClaw", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 31번 금쇄봉(감전) / 33번 죽통포(화상) / 35번 클로(회오리) 및 향후 3타 상태이상 유물 공통 처리
+                    string targetStatusId = !string.IsNullOrEmpty(relicData.StatusID)
+                        ? relicData.StatusID
+                        : (string.Equals(effectKey, "GoldenKanabo", StringComparison.OrdinalIgnoreCase)
+                            ? StatusKeys.Shock
+                            : (string.Equals(effectKey, "GoldenBambooCannon", StringComparison.OrdinalIgnoreCase)
+                                ? StatusKeys.Burn
+                                : StatusKeys.Whirlwind));
+
+                    caster.RegisterThirdHitStatusInfliction(targetStatusId, stacks > 0 ? stacks : 1);
+                    executed = true;
                 }
             }
 
+            // 전용 EffectKey에 해당하지 않는 일반 상태이상 부여 유물 폴백 처리
+            if (!executed && !string.IsNullOrEmpty(relicData.StatusID) && stacks != 0)
+            {
+                bool targetAllEnemies = effectKey.IndexOf("All", StringComparison.OrdinalIgnoreCase) >= 0;
+                bool targetRandomEnemy = !targetAllEnemies &&
+                    effectKey.IndexOf("Random", StringComparison.OrdinalIgnoreCase) >= 0;
+                bool targetSingleEnemy = !targetAllEnemies && !targetRandomEnemy &&
+                    (effectKey.IndexOf("Enemy", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     effectKey.IndexOf("Target", StringComparison.OrdinalIgnoreCase) >= 0);
+
+                ECardTarget targetMode = targetAllEnemies
+                    ? ECardTarget.AllEnemies
+                    : (targetRandomEnemy
+                        ? ECardTarget.RandomEnemy
+                        : (targetSingleEnemy ? ECardTarget.SingleEnemy : ECardTarget.Self));
+
+                if (ApplyStatusByTargetType(relicData.StatusID, stacks, targetMode, context))
+                    executed = true;
+            }
+
             return executed;
+        }
+
+        /// <summary>
+        /// [10번 휴대용 용광로 연동]: 카드가 과부하(IsOverloaded) 상태가 아니면 약화(-nonOverloadPenalty)시키고,
+        /// 과부하 상태이면 턴마다 계속 강화(+overloadBonusPerTurn)시킵니다.
+        /// </summary>
+        public static void ApplyPortableFurnaceOverloadScaling(
+            IEnumerable<CardInstance> cards,
+            int overloadBonusPerTurn = 2,
+            int nonOverloadPenalty = 1)
+        {
+            if (cards == null) return;
+            foreach (CardInstance card in cards)
+            {
+                if (card == null) continue;
+                int delta = card.IsOverloaded ? Mathf.Abs(overloadBonusPerTurn) : -Mathf.Abs(nonOverloadPenalty);
+                card.BonusDamage += delta;
+                card.BonusBlock += delta;
+            }
+        }
+
+        /// <summary>
+        /// [12번 증기 티포트 연동]: 과부하(IsOverloaded) 상태인 카드의 코스트 감소량(OverloadCostReduction)을 일괄 적용합니다.
+        /// </summary>
+        public static void ApplySteamTeapotOverloadDiscount(IEnumerable<CardInstance> cards, int costReduction = 1)
+        {
+            if (cards == null) return;
+            int reduction = Mathf.Max(0, costReduction);
+            foreach (CardInstance card in cards)
+            {
+                if (card == null) continue;
+                card.OverloadCostReduction = card.IsOverloaded ? reduction : 0;
+            }
         }
 
         private static StatusController ResolveSingleEnemy(CombatContext context)
@@ -556,6 +689,90 @@ namespace CNF.AbilitySystem
             return (context.PrimaryTarget != null && context.PrimaryTarget.IsAlive)
                 ? context.PrimaryTarget
                 : context.GetFirstAliveEnemy();
+        }
+
+        private static bool TryExecuteLowHpEnemies(CombatContext context, int thresholdPercent)
+        {
+            if (context.AllEnemies == null) return false;
+            float ratioLimit = Mathf.Clamp(thresholdPercent, 1, 99) / 100f;
+            bool executedAny = false;
+
+            for (int i = 0; i < context.AllEnemies.Count; i++)
+            {
+                StatusController enemy = context.AllEnemies[i];
+                if (enemy == null || !enemy.IsAlive || enemy.MaxHP <= 0) continue;
+
+                float hpRatio = (float)enemy.CurrentHP / enemy.MaxHP;
+                if (hpRatio < ratioLimit)
+                {
+                    enemy.TakeDirectDamage(enemy.CurrentHP, context.Caster);
+                    executedAny = true;
+                }
+            }
+            return executedAny;
+        }
+
+        private static bool TryEqualizeFieldHPWhenLow(CombatContext context, int thresholdPercent)
+        {
+            StatusController caster = context.Caster;
+            if (caster == null || !caster.IsAlive || caster.MaxHP <= 0) return false;
+
+            float ratioLimit = Mathf.Clamp(thresholdPercent, 1, 99) / 100f;
+            if ((float)caster.CurrentHP / caster.MaxHP >= ratioLimit)
+                return false;
+
+            int totalHP = caster.CurrentHP;
+            int aliveCount = 1;
+
+            if (context.AllEnemies != null)
+            {
+                for (int i = 0; i < context.AllEnemies.Count; i++)
+                {
+                    StatusController enemy = context.AllEnemies[i];
+                    if (enemy != null && enemy.IsAlive)
+                    {
+                        totalHP += enemy.CurrentHP;
+                        aliveCount++;
+                    }
+                }
+            }
+
+            if (aliveCount <= 1) return false;
+
+            int equalShare = Mathf.Max(1, totalHP / aliveCount);
+            caster.SetExactCurrentHP(equalShare);
+
+            if (context.AllEnemies != null)
+            {
+                for (int i = 0; i < context.AllEnemies.Count; i++)
+                {
+                    StatusController enemy = context.AllEnemies[i];
+                    if (enemy != null && enemy.IsAlive)
+                        enemy.SetExactCurrentHP(equalShare);
+                }
+            }
+            return true;
+        }
+
+        private static void ExecuteKyklonomiconStart(CombatContext context)
+        {
+            StatusController caster = context.Caster;
+            if (caster == null || !caster.IsAlive) return;
+
+            if (context.AllEnemies != null)
+            {
+                for (int i = 0; i < context.AllEnemies.Count; i++)
+                {
+                    StatusController enemy = context.AllEnemies[i];
+                    if (enemy != null && enemy.IsAlive)
+                        enemy.SetExactCurrentHP(Mathf.Max(1, enemy.CurrentHP / 2));
+                }
+            }
+
+            caster.Heal(Mathf.Max(1, caster.MaxHP / 2));
+            caster.AddStatus(StatusKeys.InflictWeakVulnOnAttack, 1);
+            if (caster.GetStatus(StatusKeys.KyklonomiconCurse) <= 0)
+                caster.SetStatus(StatusKeys.KyklonomiconCurse, 1);
         }
 
         private static bool DealFixedDamageToAllEnemies(CombatContext context, int damage)

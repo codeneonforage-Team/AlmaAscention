@@ -65,6 +65,22 @@ namespace CNF.AbilitySystem
                 // 3. 기본 약화(Weak x0.75) 곱연산 적용
                 if (!_handledStatuses.Contains(StatusKeys.Weak) && attacker.GetStatus(StatusKeys.Weak) > 0)
                     damage *= WeakDamageMultiplier;
+
+                // 4. 고기 호빵(21번: 풀피 유지 시 공격력 2배)
+                if (!_handledStatuses.Contains(StatusKeys.FullHpDoubleDamage) &&
+                    attacker.GetStatus(StatusKeys.FullHpDoubleDamage) > 0 &&
+                    attacker.CurrentHP >= attacker.MaxHP)
+                {
+                    damage *= 2.0f;
+                }
+
+                // 5. 재액의 단안경(14번: 적 개체가 이미 한 번 한 행동을 다시 할 때 데미지 2배)
+                if (!_handledStatuses.Contains(StatusKeys.RepeatIntentDoubleDamage) &&
+                    attacker.GetStatus(StatusKeys.RepeatIntentDoubleDamage) > 0 &&
+                    target != null && target.GetStatus(StatusKeys.RepeatActionMark) > 0)
+                {
+                    damage *= 2.0f;
+                }
             }
 
             if (target != null)
@@ -79,7 +95,22 @@ namespace CNF.AbilitySystem
                 }
 
                 if (!_handledStatuses.Contains(StatusKeys.Vulnerable) && target.GetStatus(StatusKeys.Vulnerable) > 0)
-                    damage *= VulnerableDamageMultiplier;
+                {
+                    // 용혈 귀걸이(17번: 취약 상태인 적에게 데미지 1.5배 대신 2배 적용)
+                    float vulnMultiplier = (attacker != null && attacker.GetStatus(StatusKeys.VulnerableDoubleDamage) > 0)
+                        ? 2.0f
+                        : VulnerableDamageMultiplier;
+                    damage *= vulnMultiplier;
+                }
+
+                // 녹슨 단검(23번: 독 상태의 적에게 3배 데미지)
+                if (attacker != null &&
+                    !_handledStatuses.Contains(StatusKeys.PoisonTargetTripleDamage) &&
+                    attacker.GetStatus(StatusKeys.PoisonTargetTripleDamage) > 0 &&
+                    (target.GetStatus(StatusKeys.Poison) > 0 || target.GetStatus(StatusKeys.GrowingPoison) > 0))
+                {
+                    damage *= 3.0f;
+                }
             }
 
             return Mathf.Max(0, Mathf.FloorToInt(damage));

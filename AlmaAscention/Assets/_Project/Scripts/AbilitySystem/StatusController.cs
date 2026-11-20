@@ -16,7 +16,9 @@ namespace CNF.AbilitySystem
         public readonly int MaxMana;
         public readonly int Block;
         public readonly bool IsDeathHandled;
+        public readonly int ReceivedHitCounter;
         public readonly Dictionary<string, int> Statuses;
+        public readonly Dictionary<string, int> ThirdHitInflictStatuses;
 
         public StatusSnapshot(
             int currentHP,
@@ -25,7 +27,9 @@ namespace CNF.AbilitySystem
             int maxMana,
             int block,
             bool isDeathHandled,
-            Dictionary<string, int> statuses)
+            int receivedHitCounter,
+            Dictionary<string, int> statuses,
+            Dictionary<string, int> thirdHitInflictStatuses)
         {
             CurrentHP = currentHP;
             MaxHP = maxHP;
@@ -33,7 +37,9 @@ namespace CNF.AbilitySystem
             MaxMana = maxMana;
             Block = block;
             IsDeathHandled = isDeathHandled;
+            ReceivedHitCounter = receivedHitCounter;
             Statuses = statuses;
+            ThirdHitInflictStatuses = thirdHitInflictStatuses;
         }
     }
 
@@ -70,6 +76,10 @@ namespace CNF.AbilitySystem
         private readonly Dictionary<string, int> _statuses = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<string> _keyBuffer = new(16);
 
+        // 31번 금쇄봉(감전) / 33번 죽통포(화상) / 35번 클로(회오리) 등 "3번 타격을 준 상대에게 상태이상 부여" 유물 연동용
+        private readonly Dictionary<string, int> _onEveryThirdHitInflictStatuses = new(StringComparer.OrdinalIgnoreCase);
+        private int _receivedHitCounterFromAttacker;
+
         // 개별 캐릭터 UI 및 인텐트 갱신용 로컬 이벤트
         public event Action<int, int> OnHPChanged;                  // (currentHP, maxHP)
         public event Action<int> OnBlockChanged;                    // (currentBlock)
@@ -92,6 +102,8 @@ namespace CNF.AbilitySystem
             _currentMana = maxMana;
             _block = 0;
             _isDeathHandled = false;
+            _receivedHitCounterFromAttacker = 0;
+            _onEveryThirdHitInflictStatuses.Clear();
 
             OnHPChanged?.Invoke(_currentHP, _maxHP);
             OnBlockChanged?.Invoke(_block);
@@ -118,7 +130,7 @@ namespace CNF.AbilitySystem
         }
 
         /// <summary>
-        /// [재회(턴 되감기) 권능 연동용]: 현재 시점의 체력, 방어도, 마나, 생존 상태 및 모든 상태이상(Dictionary)을 깊은 복사해 스냅샷으로 반환합니다.
+        /// [재회(턴 되감기) 권능 연동용]: 현재 시점의 체력, 방어도, 마나, 생존 상태, 3타 카운터 및 모든 상태이상(Dictionary)을 깊은 복사해 스냅샷으로 반환합니다.
         /// </summary>
         public StatusSnapshot CaptureSnapshot()
         {
@@ -129,11 +141,13 @@ namespace CNF.AbilitySystem
                 _maxMana,
                 _block,
                 _isDeathHandled,
-                new Dictionary<string, int>(_statuses, StringComparer.OrdinalIgnoreCase));
+                _receivedHitCounterFromAttacker,
+                new Dictionary<string, int>(_statuses, StringComparer.OrdinalIgnoreCase),
+                new Dictionary<string, int>(_onEveryThirdHitInflictStatuses, StringComparer.OrdinalIgnoreCase));
         }
 
         /// <summary>
-        /// [재회(턴 되감기) 권능 연동용]: 저장해 둔 스냅샷 시점으로 캐릭터의 모든 스탯과 버프/디버프 상태를 즉시 복원합니다.
+        /// [재회(턴 되감기) 권능 연동용]: 저장해 둔 스냅샷 시점으로 캐릭터의 모든 스탯, 3타 카운터, 버프/디버프 상태를 즉시 복원합니다.
         /// </summary>
         public void RestoreSnapshot(StatusSnapshot snapshot)
         {
@@ -143,6 +157,7 @@ namespace CNF.AbilitySystem
             _currentMana = snapshot.CurrentMana;
             _block = Mathf.Max(0, snapshot.Block);
             _isDeathHandled = snapshot.IsDeathHandled;
+            _receivedHitCounterFromAttacker = Mathf.Max(0, snapshot.ReceivedHitCounter);
 
             _statuses.Clear();
             if (snapshot.Statuses != null)
@@ -151,6 +166,16 @@ namespace CNF.AbilitySystem
                 {
                     if (!string.IsNullOrEmpty(kvp.Key) && kvp.Value != 0)
                         _statuses[kvp.Key] = kvp.Value;
+                }
+            }
+
+            _onEveryThirdHitInflictStatuses.Clear();
+            if (snapshot.ThirdHitInflictStatuses != null)
+            {
+                foreach (var kvp in snapshot.ThirdHitInflictStatuses)
+                {
+                    if (!string.IsNullOrEmpty(kvp.Key) && kvp.Value != 0)
+                        _onEveryThirdHitInflictStatuses[kvp.Key] = kvp.Value;
                 }
             }
 
@@ -260,9 +285,44 @@ namespace CNF.AbilitySystem
         public void ClearBattleStatuses()
         {
             _statuses.Clear();
+            _onEveryThirdHitInflictStatuses.Clear();
+            _receivedHitCounterFromAttacker = 0;
             _block = 0;
             OnBlockChanged?.Invoke(_block);
             OnAnyStatusChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// [29번 만념단모 연동]: 대상이 보유한 모든 버프, 디버프, 회피(Evasion) 등의 상태이상을 즉시 전부 해제합니다.
+        /// </summary>
+        public int DispelAllStatuses()
+        {
+            int count = _statuses.Count;
+            if (count == 0) return 0;
+
+            CopyKeysToBuffer();
+            _statuses.Clear();
+            for (int i = 0; i < _keyBuffer.Count; i++)
+            {
+                string key = _keyBuffer[i];
+                OnStatusChanged?.Invoke(key, 0);
+                CombatEvents.RaiseStatusApplied(this, key, 0, 0);
+            }
+            OnAnyStatusChanged?.Invoke();
+            return count;
+        }
+
+        /// <summary>
+        /// [31번 금쇄봉 / 33번 죽통포 / 35번 클로 연동]: 공격자가 적에게 3번 타격을 줄 때마다 부여할 상태이상(감전, 화상, 회오리 등)을 등록합니다.
+        /// 나중에 새로운 상태이상이 추가되더라도 StatusID 문자열만 넘기면 그대로 작동합니다.
+        /// </summary>
+        public void RegisterThirdHitStatusInfliction(string statusId, int stacks = 1)
+        {
+            if (string.IsNullOrEmpty(statusId) || stacks == 0) return;
+            if (_onEveryThirdHitInflictStatuses.TryGetValue(statusId, out int prev))
+                _onEveryThirdHitInflictStatuses[statusId] = prev + stacks;
+            else
+                _onEveryThirdHitInflictStatuses[statusId] = stacks;
         }
 
         private void BroadcastStatusChange(string statusId, int delta, int currentStacks)
@@ -338,6 +398,33 @@ namespace CNF.AbilitySystem
                     attacker.TakeDirectDamage(thorns, this);
             }
 
+            // 공격 적중 시 발동하는 특수 유물 패시브 처리 (만념단모 29번 / 퀴클로노미콘 30번 / 3타마다 상태이상 31·33·35번)
+            if (attacker != null && attacker != this && IsAlive)
+            {
+                _receivedHitCounterFromAttacker++;
+
+                if (attacker.GetStatus(StatusKeys.DispelTargetOnAttack) > 0)
+                {
+                    DispelAllStatuses();
+                }
+
+                int weakVulnOnHit = attacker.GetStatus(StatusKeys.InflictWeakVulnOnAttack);
+                if (weakVulnOnHit > 0)
+                {
+                    AddStatus(StatusKeys.Weak, weakVulnOnHit);
+                    AddStatus(StatusKeys.Vulnerable, weakVulnOnHit);
+                }
+
+                if (_receivedHitCounterFromAttacker % 3 == 0 && attacker._onEveryThirdHitInflictStatuses.Count > 0)
+                {
+                    foreach (var kvp in attacker._onEveryThirdHitInflictStatuses)
+                    {
+                        if (!string.IsNullOrEmpty(kvp.Key) && kvp.Value != 0)
+                            AddStatus(kvp.Key, kvp.Value);
+                    }
+                }
+            }
+
             return lostHP;
         }
 
@@ -408,6 +495,17 @@ namespace CNF.AbilitySystem
             else
                 _currentHP = Mathf.Min(_currentHP, _maxHP);
 
+            OnHPChanged?.Invoke(_currentHP, _maxHP);
+            SyncPlayerHPIfNeeded();
+        }
+
+        /// <summary>
+        /// [27번 잿빛 은 양칭저울 / 30번 퀴클로노미콘 연동]: 생존 중인 개체의 현재 체력을 지정 수치(1 ~ MaxHP)로 즉시 재조정합니다.
+        /// </summary>
+        public void SetExactCurrentHP(int exactHP)
+        {
+            if (!IsAlive) return;
+            _currentHP = Mathf.Clamp(exactHP, 1, _maxHP);
             OnHPChanged?.Invoke(_currentHP, _maxHP);
             SyncPlayerHPIfNeeded();
         }
@@ -501,6 +599,13 @@ namespace CNF.AbilitySystem
                         TakeDirectDamage(stacks);
                         SetStatus(key, stacks - 1);
                     }
+                    else if (string.Equals(key, StatusKeys.GrowingPoison, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 독을 머금은 단검(19번): 턴마다 지속 피해를 주고 스택이 1씩 오히려 증가
+                        TakeDirectDamage(stacks);
+                        if (IsAlive)
+                            SetStatus(key, stacks + 1);
+                    }
                     else if (string.Equals(key, StatusKeys.Weak, StringComparison.OrdinalIgnoreCase) ||
                              string.Equals(key, StatusKeys.Vulnerable, StringComparison.OrdinalIgnoreCase) ||
                              string.Equals(key, StatusKeys.Frail, StringComparison.OrdinalIgnoreCase) ||
@@ -525,6 +630,18 @@ namespace CNF.AbilitySystem
                     {
                         SetStatus(key, 0);
                         AddStatus(StatusKeys.Dexterity, -stacks);
+                    }
+                    else if (string.Equals(key, StatusKeys.KyklonomiconCurse, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 30번 퀴클로노미콘: 적을 4턴 안에 못 잡을 시 4턴째 종료 시부터 죽기 전까지 최대 체력이 10씩 깎임
+                        SetStatus(key, stacks + 1);
+                        if (stacks >= 4)
+                        {
+                            if (_maxHP <= 10)
+                                TakeDirectDamage(_currentHP);
+                            else
+                                AddMaxHP(-10, healAddedAmount: false);
+                        }
                     }
                 }
             }
