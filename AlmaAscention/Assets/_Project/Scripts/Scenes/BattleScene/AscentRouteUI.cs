@@ -13,7 +13,6 @@ public sealed class AscentRouteUI : MonoBehaviour
     [SerializeField] private Button[] buttons;
     [SerializeField] private TMP_Text[] captions;
 
-    private static readonly string[] Stock = { "IronWave", "TwinStrike", "Inflame" };
     private AscentRun run;
     private Action onBattleSelected;
 
@@ -41,16 +40,14 @@ public sealed class AscentRouteUI : MonoBehaviour
         }
     }
 
-    private static CardDataSO ShopCard(RouteNode node) => DataManager.Instance.GetCard(Stock[node.Variant]);
-
     private static string Describe(RouteNode node)
     {
         switch (node.Type)
         {
             case RouteNodeType.Rest:
-                return $"휴식\n체력 +{node.RestHealing}" + (node.RestGold > 0 ? $" · 골드 +{node.RestGold}" : "");
+                return $"휴식 구역\n체력 +{node.RestHealing}" + (node.RestGold > 0 ? $" · 골드 +{node.RestGold}" : "") + " 또는 카드 강화";
             case RouteNodeType.Shop:
-                return $"상점\n{ShopCard(node)?.CardName ?? "품절"} · {AscentRun.CardPrice} 골드";
+                return $"상점\n랜덤 카드 진열 · {AscentRun.CardPrice} 골드~";
             default:
                 string type = node.Type == RouteNodeType.Boss ? "보스 전투" : "일반 전투";
                 return $"{type}\n{RouteEncounter.Preview(node)}\n승리 보상 {node.VictoryGold} 골드";
@@ -63,28 +60,88 @@ public sealed class AscentRouteUI : MonoBehaviour
         switch (run.Current.Type)
         {
             case RouteNodeType.Rest:
-                Show("휴식", "쉬고 나면 다음 경로를 선택할 수 있습니다.");
-                ActionButton(0, Describe(run.Current), () =>
-                {
-                    int before = run.HP;
-                    int gold = run.Current.RestGold;
-                    run.Rest();
-                    ShowProgress($"휴식 완료 · 체력 +{run.HP - before} · 골드 +{gold}");
-                });
+                ShowRestSite();
                 break;
             case RouteNodeType.Shop:
-                var card = ShopCard(run.Current);
-                Show("카드 상점", card != null ? card.GetFormattedBaseDescription() : "상품이 소진되었습니다.");
-                ActionButton(0, $"구매 · {card?.CardName ?? "품절"}\n{AscentRun.CardPrice} 골드",
-                    () => { if (run.LeaveShop(card)) ShowProgress($"{card.CardName} 카드를 덱에 추가했습니다."); },
-                    card != null && run.Gold >= AscentRun.CardPrice);
-                ActionButton(1, "구매하지 않고 출발", () => { if (run.LeaveShop(null)) ShowProgress(); });
+                ShowShop();
                 break;
             default:
                 gameObject.SetActive(false);
                 onBattleSelected();
                 break;
         }
+    }
+
+    private void ShowRestSite()
+    {
+        Show("휴식 구역", "체력을 회복하거나 보유한 카드를 1장 영구 강화할 수 있습니다.");
+        string healText = $"휴식하기\n체력 +{run.RestSite.PlannedHealAmount}" +
+                          (run.RestSite.PlannedBonusGold > 0 ? $" · 골드 +{run.RestSite.PlannedBonusGold}" : "");
+        ActionButton(0, healText, () =>
+        {
+            int before = run.HP;
+            int gold = run.RestSite.PlannedBonusGold;
+            run.Rest();
+            ShowProgress($"휴식 완료 · 체력 +{run.HP - before}" + (gold > 0 ? $" · 골드 +{gold}" : ""));
+        });
+
+        bool canSmith = run.RestSite.CanSmith(run.Deck);
+        ActionButton(1, "단련하기 (카드 강화+)\n미강화 카드 1장 선택", ShowRestSmithSelection, canSmith);
+    }
+
+    private void ShowRestSmithSelection()
+    {
+        var upgradeable = run.RestSite.GetUpgradeableCards(run.Deck, distinctByCardId: true);
+        Show("단련할 카드를 선택하세요", "선택한 카드가 영구적으로 강화(+)됩니다.");
+
+        int maxChoices = Mathf.Min(2, upgradeable.Count);
+        for (int i = 0; i < maxChoices; i++)
+        {
+            CardInstance candidate = upgradeable[i];
+            string upgDesc = candidate.Data != null ? candidate.Data.GetFormattedBaseDescription(isUpgraded: true) : "";
+            ActionButton(i, $"강화 · {candidate.DisplayName} -> {candidate.DisplayName}+\n{upgDesc}", () =>
+            {
+                if (run.TrySmithAtRestSite(candidate.InstanceGUID, out var upgraded))
+                    ShowProgress($"단련 완료 · [{upgraded.DisplayName}] 강화!");
+            });
+        }
+
+        ActionButton(2, "돌아가기", ShowRestSite);
+    }
+
+    private void ShowShop(string notice = "")
+    {
+        var offers = run.Shop.CardOffers;
+        string detail = string.IsNullOrEmpty(notice)
+            ? "원하는 카드를 구매하세요. 골드가 충분하면 여러 장 구매할 수 있습니다."
+            : notice;
+        Show("카드 상점", detail);
+
+        int maxSlots = Mathf.Min(2, offers.Count);
+        for (int i = 0; i < maxSlots; i++)
+        {
+            int slotIndex = i;
+            var offer = offers[i];
+            if (offer.IsSold || offer.CardData == null)
+            {
+                ActionButton(i, "구매 완료", () => { }, enabled: false);
+            }
+            else
+            {
+                string caption = $"구매 · {offer.CardData.CardName} ({offer.Price} 골드)\n{offer.CardData.GetFormattedBaseDescription()}";
+                ActionButton(i, caption, () =>
+                {
+                    if (run.TryBuyShopCardOffer(slotIndex, out var bought))
+                        ShowShop($"{bought.DisplayName} 카드를 덱에 추가했습니다.");
+                }, run.Shop.CanBuyCard(slotIndex, run.Gold));
+            }
+        }
+
+        ActionButton(2, "상점 나가기", () =>
+        {
+            if (run.ExitShop())
+                ShowProgress();
+        });
     }
 
     private void Show(string title, string detail)

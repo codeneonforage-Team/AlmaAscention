@@ -315,6 +315,24 @@ namespace CNF.Data
         }
 
         /// <summary>
+        /// 상점 진열이나 전투 보상용으로 랜덤 물약 1개를 추출합니다.
+        /// </summary>
+        public PotionDataSO GetRandomPotion(EPotionRarity? rarityFilter = null)
+        {
+            var candidates = new List<PotionDataSO>();
+            foreach (var kvp in _potionDict)
+            {
+                var p = kvp.Value;
+                if (p == null) continue;
+                if (rarityFilter.HasValue && p.Rarity != rarityFilter.Value) continue;
+                candidates.Add(p);
+            }
+
+            if (candidates.Count == 0) return null;
+            return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        }
+
+        /// <summary>
         /// 현재 스테이지(1~3)와 몬스터 등급(Normal / Elite / Boss)에 부합하는 몬스터 데이터 목록을 반환합니다.
         /// </summary>
         public List<MonsterDataSO> GetMonstersByStage(int stage, EMonsterGrade? gradeFilter = null)

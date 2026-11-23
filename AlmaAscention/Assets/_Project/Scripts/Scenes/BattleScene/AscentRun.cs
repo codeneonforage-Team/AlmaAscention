@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using AlmaAscention.Deck;
 using AlmaAscention.Relic;
 using AlmaAscention.Potion;
+using AlmaAscention.Shop;
+using AlmaAscention.Rest;
 using CNF.Data;
 
 public enum RouteNodeType { Battle, Rest, Shop, Boss }
@@ -41,6 +43,8 @@ public sealed class AscentRun
     public MasterDeck Deck { get; } = new();
     public RelicManager Relics { get; } = new();
     public PotionManager Potions { get; } = new();
+    public ShopManager Shop { get; } = new();
+    public RestSiteManager RestSite { get; } = new();
     public IReadOnlyList<RouteNode> Choices { get; }
     public RouteNode Current { get; private set; }
     public AscentState State { get; private set; }
@@ -87,6 +91,12 @@ public sealed class AscentRun
         if (State != AscentState.Choosing || index < 0 || index >= choices.Length) return false;
         Current = choices[index];
         State = AscentState.InNode;
+
+        if (Current.Type == RouteNodeType.Rest)
+            RestSite.EnterRestSite(MaxHP, Current.RestHealing, Current.RestGold);
+        else if (Current.Type == RouteNodeType.Shop)
+            Shop.OpenShop(Relics, cardOfferCount: 2, baseCardPrice: CardPrice);
+
         return true;
     }
 
@@ -104,20 +114,38 @@ public sealed class AscentRun
     public void Rest()
     {
         if (State != AscentState.InNode || Current.Type != RouteNodeType.Rest) return;
-        HP = Math.Min(MaxHP, HP + Current.RestHealing);
-        Gold += Current.RestGold;
-        Advance();
+        int hp = HP;
+        int gold = Gold;
+        if (RestSite.TryRest(ref hp, MaxHP, ref gold, out _))
+        {
+            HP = hp;
+            Gold = gold;
+            Advance();
+        }
     }
 
-    // A null card means the player leaves without buying.
-    public bool LeaveShop(CardDataSO purchase)
+    public bool TrySmithAtRestSite(string cardInstanceGuid, out CardInstance upgradedCard)
+    {
+        upgradedCard = null;
+        if (State != AscentState.InNode || Current.Type != RouteNodeType.Rest) return false;
+        if (!RestSite.TrySmithCard(Deck, cardInstanceGuid, out upgradedCard)) return false;
+        Advance();
+        return true;
+    }
+
+    public bool TryBuyShopCardOffer(int offerIndex, out CardInstance purchasedCard)
+    {
+        purchasedCard = null;
+        if (State != AscentState.InNode || Current.Type != RouteNodeType.Shop) return false;
+        int gold = Gold;
+        if (!Shop.TryBuyCard(offerIndex, Deck, ref gold, out purchasedCard)) return false;
+        Gold = gold;
+        return true;
+    }
+
+    public bool ExitShop()
     {
         if (State != AscentState.InNode || Current.Type != RouteNodeType.Shop) return false;
-        if (purchase != null)
-        {
-            if (Gold < CardPrice || Deck.CreateAndAddCardOrNull(purchase) == null) return false;
-            Gold -= CardPrice;
-        }
         Advance();
         return true;
     }
