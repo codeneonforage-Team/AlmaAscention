@@ -43,9 +43,39 @@ namespace AlmaAscention.Deck
                 _drawPile.Add(card.Clone());
             }
 
-            // 전투 시작 셔플.
-            // TODO:: 선천성(Innate) 카드가 생기면 셔플 후 최상단으로 올리는 처리를 여기에 추가.
+            // 전투 시작 셔플 후 선천성(IsInnate) 카드를 최상단(리스트 끝)으로 올린다.
             ShuffleInternal();
+            MoveInnateCardsToTopInternal();
+        }
+
+        private void MoveInnateCardsToTopInternal()
+        {
+            int writeIndex = 0;
+            List<CardInstance> innateCards = null;
+
+            for (int index = 0; index < _drawPile.Count; index++)
+            {
+                CardInstance card = _drawPile[index];
+                if (card?.Data != null && card.Data.IsInnate)
+                {
+                    innateCards ??= new List<CardInstance>();
+                    innateCards.Add(card);
+                }
+                else
+                {
+                    _drawPile[writeIndex++] = card;
+                }
+            }
+
+            if (innateCards == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < innateCards.Count; index++)
+            {
+                _drawPile[writeIndex++] = innateCards[index];
+            }
         }
 
         // 부족하면 가능한 만큼만 뽑고 종료한다.

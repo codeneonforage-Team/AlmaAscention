@@ -49,7 +49,7 @@ public sealed class CardUI : MonoBehaviour
         if (Application.IsPlaying(gameObject) || previewCard == null) return;
         Set(nameText, previewCard.CardName);
         Set(costText, previewCard.IsXCost || previewCard.BaseCost < 0 ? "X" : previewCard.BaseCost.ToString());
-        Set(descriptionText, previewCard.Description);
+        Set(descriptionText, previewCard.GetFormattedBaseDescription());
         SetArt(previewCard.CardArt);
     }
 #endif

@@ -74,7 +74,7 @@ public sealed class AscentRouteUI : MonoBehaviour
                 break;
             case RouteNodeType.Shop:
                 var card = ShopCard(run.Current);
-                Show("카드 상점", card != null ? card.Description : "상품이 소진되었습니다.");
+                Show("카드 상점", card != null ? card.GetFormattedBaseDescription() : "상품이 소진되었습니다.");
                 ActionButton(0, $"구매 · {card?.CardName ?? "품절"}\n{AscentRun.CardPrice} 골드",
                     () => { if (run.LeaveShop(card)) ShowProgress($"{card.CardName} 카드를 덱에 추가했습니다."); },
                     card != null && run.Gold >= AscentRun.CardPrice);

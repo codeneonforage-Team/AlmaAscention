@@ -49,7 +49,7 @@ namespace AlmaAscention.Relic
 
         // 잘못된 데이터(null 또는 빈 ID)이면 변경 없이 실패한다.
         // 만료된 성유물도 보유 중이므로 중복 획득할 수 없다.
-        public bool TryAcquireRelic(RelicDataSO relicData)
+        public bool TryAcquireRelic(RelicDataSO relicData, StatusController playerStatus = null, Action<int> onGainGold = null)
         {
             if (relicData == null || string.IsNullOrEmpty(relicData.RelicID))
             {
@@ -64,7 +64,10 @@ namespace AlmaAscention.Relic
             Relic relic = new Relic(relicData);
             _relics.Add(relic);
 
-            // TODO: 획득 시 효과 실행 연결
+            if (playerStatus != null || onGainGold != null)
+            {
+                CardExecutor.ApplyRelicAcquireBonus(relicData, playerStatus, onGainGold);
+            }
 
             Changed?.Invoke();
 
@@ -183,8 +186,8 @@ namespace AlmaAscention.Relic
 
                 foreach (Relic relic in snapshot)
                 {
-                    // 앞선 효과로 만료되거나 제거된 유물은 건너뛴다.
-                    if (relic.IsExpired || !_relics.Contains(relic))
+                    // 앞선 효과로 만료·제거되었거나 전투 쿨타임 중인 유물은 건너뛴다.
+                    if (relic.IsExpired || relic.IsOnCooldown || !_relics.Contains(relic))
                     {
                         continue;
                     }
@@ -194,6 +197,7 @@ namespace AlmaAscention.Relic
                         continue;
                     }
 
+                    relic.StartBattleCooldown();
                     executedCount++;
                     Triggered?.Invoke(relic);
                 }
@@ -204,6 +208,15 @@ namespace AlmaAscention.Relic
             }
 
             return executedCount;
+        }
+
+        // 전투 1회가 끝날 때마다 호출하여 쿨타임(CooldownBattles)이 걸린 유물의 남은 전투 횟수를 1씩 줄인다.
+        public void OnBattleFinished()
+        {
+            foreach (Relic relic in _relics)
+            {
+                relic.AdvanceBattleCooldown();
+            }
         }
 
         #endregion

@@ -126,5 +126,14 @@ namespace CNF.Data
         [Header("5. 조립형 카드 효과 블록 리스트 (확장 핵심)")]
         [SerializeReference]
         public List<ICardEffect> Effects = new();
+
+        /// <summary>
+        /// 상점(AscentRouteUI), 도감, 보상 화면 등 전투 외부에서 {D}, {B}, {M}, {H} 태그가 기본 수치로 치환된 설명 텍스트를 반환합니다.
+        /// </summary>
+        public string GetFormattedBaseDescription(bool isUpgraded = false)
+        {
+            var tempInstance = new CardInstance(this, isUpgraded);
+            return tempInstance.GetDynamicDescription(default);
+        }
     }
 }

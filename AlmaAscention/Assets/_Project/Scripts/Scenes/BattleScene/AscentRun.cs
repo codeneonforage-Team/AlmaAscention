@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using AlmaAscention.Deck;
+using AlmaAscention.Relic;
+using AlmaAscention.Potion;
 using CNF.Data;
 
 public enum RouteNodeType { Battle, Rest, Shop, Boss }
@@ -37,6 +39,8 @@ public sealed class AscentRun
     public int MaxHP { get; private set; } = 50;
     public int Gold { get; private set; } = 15;
     public MasterDeck Deck { get; } = new();
+    public RelicManager Relics { get; } = new();
+    public PotionManager Potions { get; } = new();
     public IReadOnlyList<RouteNode> Choices { get; }
     public RouteNode Current { get; private set; }
     public AscentState State { get; private set; }
@@ -45,8 +49,16 @@ public sealed class AscentRun
     {
         this.random = random;
         Choices = Array.AsReadOnly(choices);
-        foreach (var card in startingCards)
-            if (card != null) Deck.CreateAndAddCardOrNull(card);
+        if (startingCards != null)
+        {
+            foreach (var card in startingCards)
+                if (card != null) Deck.CreateAndAddCardOrNull(card);
+        }
+        if (Deck.Count == 0 && DataManager.Instance != null)
+        {
+            foreach (var card in DataManager.Instance.GetDefaultStarterCards())
+                if (card != null) Deck.CreateAndAddCardOrNull(card);
+        }
         RollChoices();
     }
 

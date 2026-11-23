@@ -5,6 +5,8 @@ using UnityEngine;
 using CNF.Data;
 using CNF.AbilitySystem;
 using AlmaAscention.Deck;
+using AlmaAscention.Relic;
+using AlmaAscention.Potion;
 
 namespace AlmaAscention.Combat
 {
@@ -26,6 +28,8 @@ namespace AlmaAscention.Combat
         public StatusController Player { get; private set; }
         public BattleDeckManager DeckManager { get; private set; }
         public CardExecutor CardExecutor { get; private set; }
+        public RelicManager RelicManager { get; private set; }
+        public PotionManager PotionManager { get; private set; }
         public EBattleState State { get; private set; } = EBattleState.Initializing;
         public int RoundNumber { get; private set; }
         public int HandSize = 5;
@@ -53,23 +57,38 @@ namespace AlmaAscention.Combat
             IReadOnlyList<(MonsterDataSO data, StatusController status)> enemySetups,
             CardExecutor cardExecutor,
             int seed,
-            int handSize = 5)
+            int handSize = 5,
+            RelicManager relicManager = null,
+            PotionManager potionManager = null)
         {
             TeardownSubscriptions();
 
             Player = player;
             CardExecutor = cardExecutor;
+            RelicManager = relicManager;
+            PotionManager = potionManager;
             HandSize = handSize;
             RoundNumber = 0;
             _isBattleOver = false;
             _isEndingPlayerTurn = false;
 
+            if (Player != null)
+            {
+                if (PotionManager != null)
+                    Player.OnTryInterceptFatalDamage = PotionManager.TryConsumeResurrectPotion;
+                Player.OnManaChanged += HandlePlayerManaChanged;
+            }
+
             System.Random setupRandom = new System.Random(seed);
             DeckManager = new BattleDeckManager(masterDeck, new System.Random(seed));
             DeckManager.CardExhausted += HandleCardExhausted;
+            DeckManager.Reshuffled += HandleDeckReshuffled;
 
             if (CardExecutor != null)
                 CardExecutor.OnAfterCardPlayed += HandleAfterCardPlayed;
+
+            CombatEvents.OnDamageTaken += HandleCombatDamageTaken;
+            CombatEvents.OnCharacterDied += HandleCombatCharacterDied;
 
             _enemies.Clear();
             _enemyStatusCache.Clear();
@@ -92,6 +111,7 @@ namespace AlmaAscention.Combat
             for (int i = 0; i < _enemies.Count; i++)
                 _enemies[i].SelectAndAnnounceNextIntent();
 
+            TriggerRelics(ERelicTriggerType.OnBattleStart);
             BeginPlayerTurn();
         }
 
@@ -106,6 +126,8 @@ namespace AlmaAscention.Combat
             Player.ProcessTurnStartStatuses();
             Player.RefillTurnMana();
             DeckManager.Draw(HandSize);
+            TriggerRelics(ERelicTriggerType.OnTurnStart);
+            ApplyOverloadRelicsToHandIfOwned();
 
             SetState(EBattleState.PlayerTurn);
             CheckBattleEnd();
@@ -147,6 +169,7 @@ namespace AlmaAscention.Combat
                 yield break;
             }
 
+            TriggerRelics(ERelicTriggerType.OnTurnEnd);
             CleanupHandAtTurnEnd();
             Player.ProcessTurnEndStatuses();
 
@@ -164,6 +187,8 @@ namespace AlmaAscention.Combat
             {
                 CardInstance card = handSnapshot[i];
                 if (card?.Data == null) continue;
+
+                card.ResetTurnModifiers();
 
                 if (card.Data.IsEthereal)
                     DeckManager.ExhaustFromHand(card.InstanceGUID);
@@ -259,6 +284,10 @@ namespace AlmaAscention.Combat
                 CardExecutor.ClearQueue();
             StopAllCoroutines();
 
+            if (playerWon)
+                TriggerRelics(ERelicTriggerType.OnBattleWin);
+            RelicManager?.OnBattleFinished();
+
             SetState(playerWon ? EBattleState.Victory : EBattleState.Defeat);
             Log(playerWon ? "전투 승리!" : "전투 패배...");
             OnBattleEnded?.Invoke(playerWon);
@@ -288,16 +317,84 @@ namespace AlmaAscention.Combat
 
         private void HandleAfterCardPlayed(CardInstance card, CombatContext context, bool willExhaust)
         {
-            if (willExhaust)
+            bool isPower = card?.Data != null && card.Data.CardType == ECardType.Power;
+            bool recycledToHand = CardExecutor != null && CardExecutor.ShouldKeepCardInHandAfterPlay(card);
+
+            if (isPower)
+            {
+                DeckManager.RemoveFromHand(card.InstanceGUID);
+            }
+            else if (recycledToHand)
+            {
+                Log($"[우주 재활용 통] [{card.DisplayName}] 카드가 손패로 되돌아왔습니다.");
+            }
+            else if (willExhaust)
+            {
                 DeckManager.ExhaustFromHand(card.InstanceGUID);
+            }
             else
+            {
                 DeckManager.DiscardFromHand(card.InstanceGUID);
+            }
+
+            TriggerRelics(ERelicTriggerType.OnCardPlayed, context.PrimaryTarget);
+
+            if (DeckManager.HandCards.Count == 0)
+            {
+                TriggerRelics(ERelicTriggerType.OnHandEmptied, context.PrimaryTarget);
+            }
         }
 
         private void HandleCardExhausted(CardInstance card)
         {
             if (CardExecutor == null) return;
-            CardExecutor.TriggerCardExhaustPassives(card, BuildContext(null));
+            CombatContext ctx = BuildContext(null);
+            CardExecutor.TriggerCardExhaustPassives(card, ctx);
+            RelicManager?.TriggerRelics(ERelicTriggerType.OnCardExhausted, ctx);
+        }
+
+        private void HandleDeckReshuffled()
+        {
+            TriggerRelics(ERelicTriggerType.OnDeckReshuffled);
+        }
+
+        private void HandlePlayerManaChanged(int currentMana, int maxMana)
+        {
+            if (!_isBattleOver && State == EBattleState.PlayerTurn && currentMana == 0)
+            {
+                TriggerRelics(ERelicTriggerType.OnManaDepleted);
+            }
+        }
+
+        private void HandleCombatDamageTaken(StatusController target, StatusController attacker, int blockedDmg, int lostHp)
+        {
+            if (!_isBattleOver && target == Player && lostHp > 0 && Player.IsAlive)
+            {
+                TriggerRelics(ERelicTriggerType.OnDamaged);
+            }
+        }
+
+        private void HandleCombatCharacterDied(StatusController victim, StatusController killer)
+        {
+            if (!_isBattleOver && victim != null && victim.TeamID == 1)
+            {
+                TriggerRelics(ERelicTriggerType.OnEnemyKilled);
+            }
+        }
+
+        private void TriggerRelics(ERelicTriggerType timing, StatusController primaryTarget = null)
+        {
+            if (RelicManager == null || Player == null || !Player.IsAlive) return;
+            RelicManager.TriggerRelics(timing, BuildContext(primaryTarget));
+        }
+
+        private void ApplyOverloadRelicsToHandIfOwned()
+        {
+            if (RelicManager == null || DeckManager == null) return;
+            if (RelicManager.FindRelicOrNull("PortableFurnace") != null)
+                CardExecutor.ApplyPortableFurnaceOverloadScaling(DeckManager.HandCards);
+            if (RelicManager.FindRelicOrNull("SteamTeapot") != null)
+                CardExecutor.ApplySteamTeapotOverloadDiscount(DeckManager.HandCards);
         }
 
         private void Log(string message)
@@ -313,10 +410,18 @@ namespace AlmaAscention.Combat
 
         private void TeardownSubscriptions()
         {
+            if (Player != null)
+                Player.OnManaChanged -= HandlePlayerManaChanged;
             if (DeckManager != null)
+            {
                 DeckManager.CardExhausted -= HandleCardExhausted;
+                DeckManager.Reshuffled -= HandleDeckReshuffled;
+            }
             if (CardExecutor != null)
                 CardExecutor.OnAfterCardPlayed -= HandleAfterCardPlayed;
+
+            CombatEvents.OnDamageTaken -= HandleCombatDamageTaken;
+            CombatEvents.OnCharacterDied -= HandleCombatCharacterDied;
         }
 
         private void OnDestroy()

@@ -10,6 +10,8 @@ namespace AlmaAscention.Relic
         public readonly RelicDataSO OriginalRelicData;
 
         public bool IsExpired { get; private set; }
+        public int RemainingCooldownBattles { get; private set; }
+        public bool IsOnCooldown => RemainingCooldownBattles > 0;
 
         // 선조건: relicData는 유효하다.
         public Relic(RelicDataSO relicData)
@@ -21,6 +23,22 @@ namespace AlmaAscention.Relic
         internal void Expire()
         {
             IsExpired = true;
+        }
+
+        internal void StartBattleCooldown()
+        {
+            if (OriginalRelicData != null && OriginalRelicData.CooldownBattles > 0)
+            {
+                RemainingCooldownBattles = OriginalRelicData.CooldownBattles;
+            }
+        }
+
+        internal void AdvanceBattleCooldown()
+        {
+            if (RemainingCooldownBattles > 0)
+            {
+                RemainingCooldownBattles--;
+            }
         }
     }
 

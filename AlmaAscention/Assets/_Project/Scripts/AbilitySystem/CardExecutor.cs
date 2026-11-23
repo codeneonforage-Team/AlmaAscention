@@ -39,6 +39,12 @@ namespace CNF.AbilitySystem
         private static string _selfExhaustHandCardGuid;
         private static bool _wasSelfExhaustedDuringHandExhaust;
 
+        // 11번 우주 재활용 통(3번째마다 사용한 카드를 다시 손패로 복귀) 발동 여부 확인용
+        private string _lastRecycledCardGuid;
+        public bool ShouldKeepCardInHandAfterPlay(CardInstance card)
+            => card != null && !string.IsNullOrEmpty(_lastRecycledCardGuid) &&
+               string.Equals(card.InstanceGUID, _lastRecycledCardGuid, StringComparison.Ordinal);
+
         public bool IsBusy => _isProcessingQueue || _playQueue.Count > 0;
 
         public event Action<CardInstance, CombatContext> OnBeforeCardPlayed;
@@ -59,6 +65,7 @@ namespace CNF.AbilitySystem
             _pendingDeckExhaustIgnoreGuid = null;
             _selfExhaustHandCardGuid = null;
             _wasSelfExhaustedDuringHandExhaust = false;
+            _lastRecycledCardGuid = null;
         }
 
         public bool CanPlayCard(CardInstance card, CombatContext context, out string failReason)
@@ -223,8 +230,20 @@ namespace CNF.AbilitySystem
         {
             ExecuteEnchantmentEffects(card, context);
 
+            _lastRecycledCardGuid = null;
             bool isPower = card.Data != null && card.Data.CardType == ECardType.Power;
             bool shouldExhaust = card.WillExhaust || isPower;
+
+            // 11번 우주 재활용 통: 3번째마다 사용한 일반(비파워/비소멸) 카드를 손패로 되돌림
+            if (context.Caster != null && context.Caster.GetStatus(StatusKeys.RecycleEveryThirdCard) > 0)
+            {
+                int playedCount = context.Caster.GetStatus(StatusKeys.PlayedCardCounter) + 1;
+                context.Caster.SetStatus(StatusKeys.PlayedCardCounter, playedCount);
+                if (playedCount % 3 == 0 && !shouldExhaust)
+                {
+                    _lastRecycledCardGuid = card.InstanceGUID;
+                }
+            }
 
             if (shouldExhaust)
             {
@@ -624,6 +643,35 @@ namespace CNF.AbilitySystem
                                 : StatusKeys.Whirlwind));
 
                     caster.RegisterThirdHitStatusInfliction(targetStatusId, stacks > 0 ? stacks : 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "SpaceRecycleBin", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(effectKey, "RecycleEveryThirdCard", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 11번 우주 재활용 통: 3번째마다 사용한 카드를 다시 손패로 되돌림
+                    caster.AddStatus(StatusKeys.RecycleEveryThirdCard, 1);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "WorkGloves", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 15번 공사장 목장갑: 체력/힘/코스트 중 선택된 스탯(StatusID로 지정, 기본 Strength)을 누적 스택만큼 부여
+                    int bonus = stacks > 0 ? stacks : 1;
+                    if (string.Equals(relicData.StatusID, "MaxHP", StringComparison.OrdinalIgnoreCase))
+                        caster.AddMaxHP(bonus, healAddedAmount: true);
+                    else if (string.Equals(relicData.StatusID, "Mana", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(relicData.StatusID, "Cost", StringComparison.OrdinalIgnoreCase))
+                        caster.GainMana(bonus);
+                    else
+                        caster.AddStatus(!string.IsNullOrEmpty(relicData.StatusID) ? relicData.StatusID : StatusKeys.Strength, bonus);
+                    executed = true;
+                }
+                else if (string.Equals(effectKey, "NumberOneDrinkHat", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 28번 넘버원의 음료수 모자: 연속 전투 횟수(stacks, 2연속 이상부터)에 비례해 힘/방어도/마나 복합 버프 부여
+                    int streakBonus = stacks > 0 ? stacks : 1;
+                    caster.AddStatus(StatusKeys.Strength, streakBonus);
+                    caster.AddBlock(streakBonus * 3, applyDexterity: false);
+                    caster.GainMana(1);
                     executed = true;
                 }
             }

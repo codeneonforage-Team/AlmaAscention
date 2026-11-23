@@ -18,6 +18,7 @@ namespace AlmaAscention.Combat
 
         private EnemyBrain _brain;
         private StatusController _previewTarget;
+        private readonly System.Collections.Generic.HashSet<string> _seenPatternIds = new(StringComparer.OrdinalIgnoreCase);
 
         // 의도가 (다시) 선택될 때마다 발생함. UI는 이 이벤트로만 다음 의도 받아가야 하고, 자기가 알아서 재추첨 걸면 안 됨.
         public event Action<EnemyRuntime> OnIntentChanged;
@@ -36,6 +37,7 @@ namespace AlmaAscention.Combat
             Status = status;
             _previewTarget = previewTarget;
             _brain = new EnemyBrain(data, random);
+            _seenPatternIds.Clear();
             CurrentIntent = null;
         }
 
@@ -49,6 +51,19 @@ namespace AlmaAscention.Combat
 
             float ratio = Status.MaxHP > 0 ? (float)Status.CurrentHP / Status.MaxHP : 0f;
             CurrentIntent = _brain.SelectNextPattern(ratio);
+
+            // 14번 재액의 단안경 연동: 이번 전투에서 이미 한 번 선택/수행했던 행동을 다시 예고할 때 RepeatActionMark 부여
+            if (CurrentIntent != null)
+            {
+                string patKey = !string.IsNullOrEmpty(CurrentIntent.PatternID) ? CurrentIntent.PatternID : CurrentIntent.PatternName;
+                bool isRepeated = !string.IsNullOrEmpty(patKey) && !_seenPatternIds.Add(patKey);
+                Status.SetStatus(StatusKeys.RepeatActionMark, isRepeated ? 1 : 0);
+            }
+            else
+            {
+                Status.SetStatus(StatusKeys.RepeatActionMark, 0);
+            }
+
             OnIntentChanged?.Invoke(this);
         }
 

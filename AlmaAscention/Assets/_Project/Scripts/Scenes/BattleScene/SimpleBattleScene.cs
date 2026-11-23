@@ -49,8 +49,7 @@ public sealed class SimpleBattleScene : MonoBehaviour
         var executor = encounterRoot.AddComponent<CardExecutor>();
         Flow = encounterRoot.AddComponent<BattleFlow>();
         Flow.Setup(player, run.Deck, new List<(MonsterDataSO, StatusController)> { (monster, Enemy) },
-            executor, random.Next(), 5);
-        Flow.DeckManager.Shuffle();
+            executor, random.Next(), 5, run.Relics, run.Potions);
         Flow.OnLogMessage += OnLog;
         Flow.OnBattleEnded += FinishEncounter;
         ShowBattle(true);
