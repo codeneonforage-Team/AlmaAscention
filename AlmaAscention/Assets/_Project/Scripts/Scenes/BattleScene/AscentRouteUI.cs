@@ -14,9 +14,9 @@ public sealed class AscentRouteUI : MonoBehaviour
     [SerializeField] private TMP_Text[] captions;
 
     private AscentRun run;
-    private Action onBattleSelected;
+    private Action<MonsterDataSO> onBattleSelected;
 
-    public void Initialize(AscentRun ascent, Action startBattle)
+    public void Initialize(AscentRun ascent, Action<MonsterDataSO> startBattle)
     {
         run = ascent;
         onBattleSelected = startBattle;
@@ -36,11 +36,13 @@ public sealed class AscentRouteUI : MonoBehaviour
         {
             int index = i;
             var node = run.Choices[i];
-            ActionButton(i, Describe(node), () => Choose(index));
+            var monster = RouteEncounter.Resolve(node, run.Stage);
+            bool isBattle = node.Type == RouteNodeType.Battle || node.Type == RouteNodeType.Boss;
+            ActionButton(i, Describe(node, monster), () => Choose(index, monster), !isBattle || monster != null);
         }
     }
 
-    private static string Describe(RouteNode node)
+    private static string Describe(RouteNode node, MonsterDataSO monster)
     {
         switch (node.Type)
         {
@@ -50,12 +52,15 @@ public sealed class AscentRouteUI : MonoBehaviour
                 return $"상점\n랜덤 카드 진열 · {AscentRun.CardPrice} 골드~";
             default:
                 string type = node.Type == RouteNodeType.Boss ? "보스 전투" : "일반 전투";
-                return $"{type}\n{RouteEncounter.Preview(node)}\n승리 보상 {node.VictoryGold} 골드";
+                if (monster == null) return $"{type}\n몬스터 데이터 없음";
+                return $"{type}\n{RouteEncounter.Preview(monster)}\n승리 보상 {node.VictoryGold} 골드";
         }
     }
 
-    private void Choose(int index)
+    private void Choose(int index, MonsterDataSO monster)
     {
+        var type = run.Choices[index].Type;
+        if ((type == RouteNodeType.Battle || type == RouteNodeType.Boss) && monster == null) return;
         if (!run.TryChoose(index)) return;
         switch (run.Current.Type)
         {
@@ -67,7 +72,7 @@ public sealed class AscentRouteUI : MonoBehaviour
                 break;
             default:
                 gameObject.SetActive(false);
-                onBattleSelected();
+                onBattleSelected(monster);
                 break;
         }
     }

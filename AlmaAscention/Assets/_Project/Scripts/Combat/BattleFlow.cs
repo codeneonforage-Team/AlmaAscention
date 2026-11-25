@@ -275,6 +275,14 @@ namespace AlmaAscention.Combat
             return false;
         }
 
+        public void SkipBattleForDevelopment()
+        {
+            if (!Debug.isDebugBuild || State == EBattleState.Initializing || Player == null || !Player.IsAlive)
+                return;
+
+            FinishBattle(true);
+        }
+
         private void FinishBattle(bool playerWon)
         {
             if (_isBattleOver) return;

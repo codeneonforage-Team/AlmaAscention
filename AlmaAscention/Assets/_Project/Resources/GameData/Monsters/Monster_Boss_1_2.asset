@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 183832e579354a648b871259b6e596e6, type: 3}
+  m_Name: Monster_Boss_1_2
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.MonsterDataSO
+  CustomParams: []
+  MonsterID: Boss_1_2
+  MonsterName: "\uCCA0\uBCBD\uC758 \uAD70\uC8FC"
+  Grade: 2
+  StageAppearance: 1
+  MinHP: 50
+  MaxHP: 50
+  InitialBlock: 0
+  CharacterPrefab: {fileID: 0}
+  PortraitOrSprite: {fileID: 21300000, guid: e67f700fa4e843142ac4afe37e72611e, type: 3}
+  Patterns:
+  - PatternID: Strike
+    PatternName: "\uBC29\uD328 \uAC15\uD0C0"
+    IntentType: 3
+    BaseDamage: 7
+    HitCount: 1
+    BlockGain: 5
+    InflictStatusID: 
+    StatusStacks: 0
+    ApplyStatusToSelf: 0
+    SummonMonsterID: 
+    SelectionWeight: 1
+    CooldownTurns: 0
+    MaxConsecutiveUses: 0
+    TurnModulo: 0
+    MaxHPRatioCondition: 1
+    IsSpecialPattern: 0
+    SpecialPriority: 0
+    AnimTriggerName: Attack
+  Phases: []

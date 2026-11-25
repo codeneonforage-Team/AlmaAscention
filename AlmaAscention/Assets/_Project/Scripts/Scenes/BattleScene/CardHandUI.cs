@@ -27,14 +27,14 @@ public sealed class CardHandUI : MonoBehaviour
     [SerializeField] private bool showPreview = true;
     [SerializeField, Range(1, 12)] private int previewCardCount = 5;
     private readonly List<CardDragView> views = new();
-    private SimpleBattleScene battle;
+    private BattleScene battle;
     private RectTransform root;
     private UnityEngine.UI.Image dropImage;
     private CardDragView hovered, dragged;
     private bool refreshCanvasOnFirstHand;
     public bool IsDragging => dragged != null;
 
-    public void Initialize(SimpleBattleScene owner)
+    public void Initialize(BattleScene owner)
     {
         battle = owner;
         root = (RectTransform)transform;
