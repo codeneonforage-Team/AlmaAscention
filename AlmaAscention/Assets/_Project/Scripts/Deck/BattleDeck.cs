@@ -167,6 +167,17 @@ namespace AlmaAscention.Deck
             _exhaustPile.Add(card);
         }
 
+        internal void RestorePiles(IEnumerable<CardInstance> draw, IEnumerable<CardInstance> discard,
+            IEnumerable<CardInstance> exhaust)
+        {
+            _drawPile.Clear();
+            _drawPile.AddRange(draw);
+            _discardPile.Clear();
+            _discardPile.AddRange(discard);
+            _exhaustPile.Clear();
+            _exhaustPile.AddRange(exhaust);
+        }
+
         // TODO: 연출 시스템 연결 시 드로우·셔플·카드 이동의
         // 처리 순서와 재생에 필요한 당시 정보를 전달하도록 확장한다.
     }

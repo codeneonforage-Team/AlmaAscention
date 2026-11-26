@@ -32,6 +32,8 @@ public sealed class AscentRun
     public const int StageCount = 5;
     public const int StepsPerStage = 10;
     public const int CardPrice = 15;
+    public const int RegainsPerChapter = 3;
+    public const int RerollsPerBattle = 2;
     private readonly Random random;
     private readonly RouteNode[] choices = new RouteNode[3];
 
@@ -48,6 +50,17 @@ public sealed class AscentRun
     public IReadOnlyList<RouteNode> Choices { get; }
     public RouteNode Current { get; private set; }
     public AscentState State { get; private set; }
+    public int RemainingChapterRegains { get; private set; } = RegainsPerChapter;
+    public int RemainingRewardRerolls { get; private set; }
+    public bool RewardPending { get; private set; }
+    private readonly List<CardDataSO> rewardCards = new();
+    public IReadOnlyList<CardDataSO> RewardCards => rewardCards;
+
+    public void SpendChapterRegain()
+    {
+        if (RemainingChapterRegains <= 0) throw new InvalidOperationException("재회 사용 횟수가 없습니다.");
+        RemainingChapterRegains--;
+    }
 
     public AscentRun(IEnumerable<CardDataSO> startingCards, Random random)
     {
@@ -91,6 +104,9 @@ public sealed class AscentRun
         if (State != AscentState.Choosing || index < 0 || index >= choices.Length) return false;
         Current = choices[index];
         State = AscentState.InNode;
+        RewardPending = false;
+        rewardCards.Clear();
+        RemainingRewardRerolls = RerollsPerBattle;
 
         if (Current.Type == RouteNodeType.Rest)
             RestSite.EnterRestSite(MaxHP, Current.RestHealing, Current.RestGold);
@@ -108,7 +124,44 @@ public sealed class AscentRun
         HP = Math.Clamp(hp, 0, MaxHP);
         if (!won || HP == 0) { State = AscentState.Defeated; return; }
         Gold += Current.VictoryGold;
+        if (DataManager.Instance != null)
+            rewardCards.AddRange(DataManager.Instance.GetRandomCards(2));
+        RewardPending = rewardCards.Count > 0;
+        if (!RewardPending) Advance();
+    }
+
+    public bool TryRerollReward()
+    {
+        if (!RewardPending || RemainingRewardRerolls <= 0 || DataManager.Instance == null) return false;
+        var excluded = new List<string>();
+        foreach (var card in rewardCards) excluded.Add(card.CardID);
+        var next = DataManager.Instance.GetRandomCards(rewardCards.Count, excludeCardIds: excluded);
+        if (next.Count == 0) return false;
+        rewardCards.Clear();
+        rewardCards.AddRange(next);
+        RemainingRewardRerolls--;
+        return true;
+    }
+
+    public bool TryTakeReward(int index, out CardInstance card)
+    {
+        card = null;
+        if (!RewardPending || index < 0 || index >= rewardCards.Count) return false;
+        card = Deck.CreateAndAddCardOrNull(rewardCards[index]);
+        if (card == null) return false;
+        RewardPending = false;
+        rewardCards.Clear();
         Advance();
+        return true;
+    }
+
+    public bool SkipReward()
+    {
+        if (!RewardPending) return false;
+        RewardPending = false;
+        rewardCards.Clear();
+        Advance();
+        return true;
     }
 
     public void Rest()
@@ -157,6 +210,7 @@ public sealed class AscentRun
             if (Stage == StageCount) { State = AscentState.Cleared; return; }
             Stage++;
             Step = 1;
+            RemainingChapterRegains = RegainsPerChapter;
         }
         else Step++;
         RollChoices();

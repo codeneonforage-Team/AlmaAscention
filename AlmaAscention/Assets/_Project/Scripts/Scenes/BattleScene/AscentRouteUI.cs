@@ -42,6 +42,37 @@ public sealed class AscentRouteUI : MonoBehaviour
         }
     }
 
+    public void ShowReward(string outcome = "")
+    {
+        if (!run.RewardPending) { ShowProgress(outcome); return; }
+        Show("전투 보상 · 카드 1장 선택", outcome);
+        for (int i = 0; i < Mathf.Min(2, run.RewardCards.Count); i++)
+        {
+            int index = i;
+            CardDataSO card = run.RewardCards[i];
+            ActionButton(i, $"획득 · {card.CardName}\n{card.GetFormattedBaseDescription()}", () =>
+            {
+                if (run.TryTakeReward(index, out var taken))
+                    ShowProgress($"[{taken.DisplayName}] 카드를 덱에 추가했습니다.");
+            });
+        }
+        ActionButton(2, $"재첨 / 건너뛰기\n재첨 {run.RemainingRewardRerolls}회 남음", ShowRewardOptions);
+    }
+
+    private void ShowRewardOptions()
+    {
+        Show("전투 보상", "재첨은 현재 제시된 카드를 다시 추첨합니다.");
+        ActionButton(0, $"재첨하기 ({run.RemainingRewardRerolls}회 남음)", () =>
+        {
+            if (run.TryRerollReward()) ShowReward("새 카드가 제시되었습니다.");
+        }, run.RemainingRewardRerolls > 0);
+        ActionButton(1, "카드 없이 진행", () =>
+        {
+            if (run.SkipReward()) ShowProgress("카드 보상을 건너뛰었습니다.");
+        });
+        ActionButton(2, "카드 선택으로 돌아가기", () => ShowReward());
+    }
+
     private static string Describe(RouteNode node, MonsterDataSO monster)
     {
         switch (node.Type)

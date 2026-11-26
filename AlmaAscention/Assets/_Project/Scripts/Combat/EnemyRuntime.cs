@@ -12,6 +12,28 @@ namespace AlmaAscention.Combat
     [RequireComponent(typeof(StatusController))]
     public class EnemyRuntime : MonoBehaviour
     {
+        public sealed class Snapshot
+        {
+            internal EnemyBrain.Snapshot Brain;
+            internal MonsterSkillPatternData Intent;
+            internal string[] SeenPatternIds;
+        }
+
+        public Snapshot CaptureSnapshot() => new Snapshot
+        {
+            Brain = _brain.CaptureSnapshot(),
+            Intent = CurrentIntent,
+            SeenPatternIds = new System.Collections.Generic.List<string>(_seenPatternIds).ToArray()
+        };
+
+        public void RestoreSnapshot(Snapshot snapshot)
+        {
+            _brain.RestoreSnapshot(snapshot.Brain);
+            CurrentIntent = snapshot.Intent;
+            _seenPatternIds.Clear();
+            foreach (var id in snapshot.SeenPatternIds) _seenPatternIds.Add(id);
+            OnIntentChanged?.Invoke(this);
+        }
         public MonsterDataSO Data { get; private set; }
         public StatusController Status { get; private set; }
         public MonsterSkillPatternData CurrentIntent { get; private set; }

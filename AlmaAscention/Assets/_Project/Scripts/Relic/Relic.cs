@@ -40,6 +40,12 @@ namespace AlmaAscention.Relic
                 RemainingCooldownBattles--;
             }
         }
+
+        internal void RestoreState(bool expired, int cooldown)
+        {
+            IsExpired = expired;
+            RemainingCooldownBattles = cooldown;
+        }
     }
 
 }

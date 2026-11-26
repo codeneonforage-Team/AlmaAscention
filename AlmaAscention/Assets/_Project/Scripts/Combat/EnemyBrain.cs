@@ -12,6 +12,39 @@ namespace AlmaAscention.Combat
     // MonsterDataSO 같은 공유 에셋에는 절대 안 씀.
     public sealed class EnemyBrain
     {
+        public sealed class Snapshot
+        {
+            internal int PhaseIndex, ActionOpportunityNumber, ConsecutiveUseCount;
+            internal string LastPatternID;
+            internal Dictionary<string, int> Cooldowns;
+            internal Dictionary<int, int> Cursors;
+            internal ulong RandomState;
+        }
+
+        public Snapshot CaptureSnapshot() => new Snapshot
+        {
+            PhaseIndex = _phaseIndex,
+            ActionOpportunityNumber = _actionOpportunityNumber,
+            ConsecutiveUseCount = _consecutiveUseCount,
+            LastPatternID = _lastPatternID,
+            Cooldowns = new Dictionary<string, int>(_cooldownRemaining, StringComparer.Ordinal),
+            Cursors = new Dictionary<int, int>(_sequentialCursorByPhase),
+            RandomState = (_random as CombatRandom)?.State ?? 0
+        };
+
+        public void RestoreSnapshot(Snapshot snapshot)
+        {
+            _phaseIndex = snapshot.PhaseIndex;
+            _actionOpportunityNumber = snapshot.ActionOpportunityNumber;
+            _consecutiveUseCount = snapshot.ConsecutiveUseCount;
+            _lastPatternID = snapshot.LastPatternID;
+            _cooldownRemaining.Clear();
+            foreach (var pair in snapshot.Cooldowns) _cooldownRemaining.Add(pair.Key, pair.Value);
+            _sequentialCursorByPhase.Clear();
+            foreach (var pair in snapshot.Cursors) _sequentialCursorByPhase.Add(pair.Key, pair.Value);
+            if (_random is CombatRandom random && snapshot.RandomState != 0)
+                random.State = snapshot.RandomState;
+        }
         private readonly MonsterDataSO _data;
         private readonly Random _random;
         private readonly IReadOnlyList<MonsterPhaseData> _phases;

@@ -7,6 +7,14 @@ namespace AlmaAscention.Potion
 {
     public sealed class PotionManager
     {
+        public PotionDataSO[] CaptureSnapshot() => _slots.ToArray();
+
+        public void RestoreSnapshot(PotionDataSO[] slots)
+        {
+            _slots.Clear();
+            _slots.AddRange(slots);
+            Changed?.Invoke();
+        }
         public const int DefaultSlotCount = 3;
 
         // null은 빈 슬롯을 뜻한다.

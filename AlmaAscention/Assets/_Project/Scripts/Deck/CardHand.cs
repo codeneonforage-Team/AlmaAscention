@@ -52,6 +52,12 @@ namespace AlmaAscention.Deck
             return null;
         }
 
+        internal void RestoreCards(IEnumerable<CardInstance> cards)
+        {
+            _cards.Clear();
+            _cards.AddRange(cards);
+        }
+
         // 변경 알림은 소유자인 BattleDeckManager가 일괄 담당한다.
     }
 }

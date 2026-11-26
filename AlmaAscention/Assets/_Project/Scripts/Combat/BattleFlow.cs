@@ -33,6 +33,30 @@ namespace AlmaAscention.Combat
         public EBattleState State { get; private set; } = EBattleState.Initializing;
         public int RoundNumber { get; private set; }
         public int HandSize = 5;
+        [Min(1)] public int MaxTurnsPerRegain = 2;
+        [Min(0)] public int RegainsPerBattle = 2;
+        public int RemainingBattleRegains => Math.Max(0, RegainsPerBattle - _regainsUsed);
+        public int RemainingChapterRegains => _getChapterRegains?.Invoke() ?? 0;
+        public int AvailableRegainTurns => Math.Min(MaxTurnsPerRegain, _history.Count);
+        public bool IsDefeatPending => _pendingDefeat;
+
+        private sealed class BattleSnapshot
+        {
+            public int Round;
+            public StatusSnapshot Player;
+            public StatusSnapshot[] Enemies;
+            public EnemyRuntime.Snapshot[] EnemyBrains;
+            public BattleDeckManager.Snapshot Deck;
+            public RelicManager.Snapshot Relics;
+            public PotionDataSO[] Potions;
+            public UnityEngine.Random.State UnityRandom;
+        }
+
+        private readonly List<BattleSnapshot> _history = new();
+        private Func<int> _getChapterRegains;
+        private Action _spendChapterRegain;
+        private int _regainsUsed;
+        private bool _pendingDefeat;
 
         private readonly List<EnemyRuntime> _enemies = new();
         private readonly List<StatusController> _enemyStatusCache = new();
@@ -59,7 +83,9 @@ namespace AlmaAscention.Combat
             int seed,
             int handSize = 5,
             RelicManager relicManager = null,
-            PotionManager potionManager = null)
+            PotionManager potionManager = null,
+            Func<int> getChapterRegains = null,
+            Action spendChapterRegain = null)
         {
             TeardownSubscriptions();
 
@@ -67,6 +93,11 @@ namespace AlmaAscention.Combat
             CardExecutor = cardExecutor;
             RelicManager = relicManager;
             PotionManager = potionManager;
+            _getChapterRegains = getChapterRegains;
+            _spendChapterRegain = spendChapterRegain;
+            _history.Clear();
+            _regainsUsed = 0;
+            _pendingDefeat = false;
             HandSize = handSize;
             RoundNumber = 0;
             _isBattleOver = false;
@@ -79,8 +110,8 @@ namespace AlmaAscention.Combat
                 Player.OnManaChanged += HandlePlayerManaChanged;
             }
 
-            System.Random setupRandom = new System.Random(seed);
-            DeckManager = new BattleDeckManager(masterDeck, new System.Random(seed));
+            CombatRandom setupRandom = new CombatRandom(seed);
+            DeckManager = new BattleDeckManager(masterDeck, new CombatRandom(seed));
             DeckManager.CardExhausted += HandleCardExhausted;
             DeckManager.Reshuffled += HandleDeckReshuffled;
 
@@ -96,7 +127,7 @@ namespace AlmaAscention.Combat
             {
                 EnemyRuntime runtime = status.GetComponent<EnemyRuntime>();
                 if (runtime == null) runtime = status.gameObject.AddComponent<EnemyRuntime>();
-                runtime.Initialize(data, status, player, new System.Random(setupRandom.Next()));
+                runtime.Initialize(data, status, player, new CombatRandom(setupRandom.Next()));
                 _enemies.Add(runtime);
                 _enemyStatusCache.Add(status);
             }
@@ -130,7 +161,72 @@ namespace AlmaAscention.Combat
             ApplyOverloadRelicsToHandIfOwned();
 
             SetState(EBattleState.PlayerTurn);
-            CheckBattleEnd();
+            if (!CheckBattleEnd()) CaptureTurnStart();
+        }
+
+        private void CaptureTurnStart()
+        {
+            var snapshot = new BattleSnapshot
+            {
+                Round = RoundNumber,
+                Player = Player.CaptureSnapshot(),
+                Enemies = new StatusSnapshot[_enemies.Count],
+                EnemyBrains = new EnemyRuntime.Snapshot[_enemies.Count],
+                Deck = DeckManager.CaptureSnapshot(),
+                Relics = RelicManager?.CaptureSnapshot(),
+                Potions = PotionManager?.CaptureSnapshot(),
+                UnityRandom = UnityEngine.Random.state
+            };
+            for (int i = 0; i < _enemies.Count; i++)
+            {
+                snapshot.Enemies[i] = _enemies[i].Status.CaptureSnapshot();
+                snapshot.EnemyBrains[i] = _enemies[i].CaptureSnapshot();
+            }
+            _history.Add(snapshot);
+            while (_history.Count > MaxTurnsPerRegain)
+                _history.RemoveAt(0);
+        }
+
+        // turnsBack=1은 현재 턴 시작, 2는 이전 턴 시작으로 복원한다.
+        public bool CanRegain(int turnsBack) =>
+            turnsBack >= 1 && turnsBack <= AvailableRegainTurns &&
+            RemainingBattleRegains > 0 && RemainingChapterRegains > 0 &&
+            (State == EBattleState.PlayerTurn || _pendingDefeat) &&
+            (CardExecutor == null || !CardExecutor.IsBusy);
+
+        public bool TryRegain(int turnsBack)
+        {
+            if (!CanRegain(turnsBack)) return false;
+            int index = _history.Count - turnsBack;
+            BattleSnapshot snapshot = _history[index];
+            CardExecutor?.ClearQueue();
+            StopAllCoroutines();
+            _isBattleOver = false;
+            _pendingDefeat = false;
+            _isEndingPlayerTurn = false;
+            RoundNumber = snapshot.Round;
+            UnityEngine.Random.state = snapshot.UnityRandom;
+            RelicManager?.RestoreSnapshot(snapshot.Relics);
+            PotionManager?.RestoreSnapshot(snapshot.Potions);
+            Player.RestoreSnapshot(snapshot.Player);
+            for (int i = 0; i < _enemies.Count; i++)
+            {
+                _enemies[i].Status.RestoreSnapshot(snapshot.Enemies[i]);
+                _enemies[i].RestoreSnapshot(snapshot.EnemyBrains[i]);
+            }
+            DeckManager.RestoreSnapshot(snapshot.Deck);
+            _history.RemoveRange(index + 1, _history.Count - index - 1);
+            _regainsUsed++;
+            _spendChapterRegain?.Invoke();
+            SetState(EBattleState.PlayerTurn);
+            OnRoundChanged?.Invoke(RoundNumber);
+            Log($"재회: {RoundNumber}턴 시작으로 돌아왔습니다.");
+            return true;
+        }
+
+        public void ConfirmDefeat()
+        {
+            if (_pendingDefeat) FinishBattle(false, force: true);
         }
 
         public bool TryPlayCard(CardInstance card, StatusController target)
@@ -283,10 +379,22 @@ namespace AlmaAscention.Combat
             FinishBattle(true);
         }
 
-        private void FinishBattle(bool playerWon)
+        private void FinishBattle(bool playerWon, bool force = false)
         {
-            if (_isBattleOver) return;
+            if (_isBattleOver && !_pendingDefeat) return;
+            if (!playerWon && !force && _history.Count > 0 &&
+                RemainingBattleRegains > 0 && RemainingChapterRegains > 0)
+            {
+                _isBattleOver = true;
+                _pendingDefeat = true;
+                CardExecutor?.ClearQueue();
+                StopAllCoroutines();
+                SetState(EBattleState.Defeat);
+                Log("패배했습니다. 재회를 사용하거나 결과를 확정하세요.");
+                return;
+            }
             _isBattleOver = true;
+            _pendingDefeat = false;
 
             if (CardExecutor != null)
                 CardExecutor.ClearQueue();

@@ -13,6 +13,43 @@ namespace CNF.Data
     [Serializable]
     public class CardInstance
     {
+        public readonly struct CombatState
+        {
+            public readonly CardInstance Card;
+            public readonly bool Upgraded;
+            public readonly string Enchantment;
+            public readonly int Cost, Damage, Block, OverloadReduction;
+            public readonly bool Overloaded, SuppressUpgradeCandidate;
+
+            public CombatState(CardInstance card)
+            {
+                Card = card;
+                Upgraded = card._isUpgraded;
+                Enchantment = card._enchantmentId;
+                Cost = card.TempCostOverride;
+                Damage = card.BonusDamage;
+                Block = card.BonusBlock;
+                Overloaded = card.IsOverloaded;
+                SuppressUpgradeCandidate = card.SuppressHandUpgradeCandidate;
+                OverloadReduction = card.OverloadCostReduction;
+            }
+        }
+
+        public CombatState CaptureCombatState() => new CombatState(this);
+
+        public void RestoreCombatState(CombatState state)
+        {
+            if (state.Card != this) throw new InvalidOperationException("다른 카드의 상태를 복원할 수 없습니다.");
+            _isUpgraded = state.Upgraded;
+            _enchantmentId = state.Enchantment;
+            TempCostOverride = state.Cost;
+            BonusDamage = state.Damage;
+            BonusBlock = state.Block;
+            IsOverloaded = state.Overloaded;
+            SuppressHandUpgradeCandidate = state.SuppressUpgradeCandidate;
+            OverloadCostReduction = state.OverloadReduction;
+            OnCardStateChanged?.Invoke(this);
+        }
         [SerializeField] private string _instanceGuid;
         [SerializeField] private string _cardId;
         [SerializeField] private bool _isUpgraded;

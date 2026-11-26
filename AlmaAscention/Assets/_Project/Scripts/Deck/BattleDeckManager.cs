@@ -7,6 +7,37 @@ namespace AlmaAscention.Deck
 {
     public sealed class BattleDeckManager : IDeckOperations
     {
+        public sealed class Snapshot
+        {
+            public readonly List<CardInstance> Hand, Draw, Discard, Exhaust;
+            public readonly List<CardInstance.CombatState> Cards;
+            public readonly ulong RandomState;
+
+            internal Snapshot(BattleDeckManager manager)
+            {
+                Hand = new List<CardInstance>(manager.HandCards);
+                Draw = new List<CardInstance>(manager.DrawPile);
+                Discard = new List<CardInstance>(manager.DiscardPile);
+                Exhaust = new List<CardInstance>(manager.ExhaustPile);
+                Cards = new List<CardInstance.CombatState>();
+                foreach (var pile in new[] { Hand, Draw, Discard, Exhaust })
+                    foreach (var card in pile) Cards.Add(card.CaptureCombatState());
+                RandomState = (manager._random as AlmaAscention.Combat.CombatRandom)?.State ?? 0;
+            }
+        }
+
+        public Snapshot CaptureSnapshot() => new Snapshot(this);
+
+        public void RestoreSnapshot(Snapshot snapshot)
+        {
+            foreach (var cardState in snapshot.Cards)
+                cardState.Card.RestoreCombatState(cardState);
+            _cardHand.RestoreCards(snapshot.Hand);
+            _battleDeck.RestorePiles(snapshot.Draw, snapshot.Discard, snapshot.Exhaust);
+            if (_random is AlmaAscention.Combat.CombatRandom random && snapshot.RandomState != 0)
+                random.State = snapshot.RandomState;
+            Changed?.Invoke();
+        }
         public enum CardDestination
         {
             Hand,

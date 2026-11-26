@@ -7,6 +7,37 @@ namespace AlmaAscention.Relic
 {
     public sealed class RelicManager
     {
+        public sealed class Snapshot
+        {
+            internal Relic[] Relics;
+            internal bool[] Expired;
+            internal int[] Cooldowns;
+        }
+
+        public Snapshot CaptureSnapshot()
+        {
+            var snapshot = new Snapshot
+            {
+                Relics = _relics.ToArray(),
+                Expired = new bool[_relics.Count],
+                Cooldowns = new int[_relics.Count]
+            };
+            for (int i = 0; i < _relics.Count; i++)
+            {
+                snapshot.Expired[i] = _relics[i].IsExpired;
+                snapshot.Cooldowns[i] = _relics[i].RemainingCooldownBattles;
+            }
+            return snapshot;
+        }
+
+        public void RestoreSnapshot(Snapshot snapshot)
+        {
+            _relics.Clear();
+            _relics.AddRange(snapshot.Relics);
+            for (int i = 0; i < _relics.Count; i++)
+                _relics[i].RestoreState(snapshot.Expired[i], snapshot.Cooldowns[i]);
+            Changed?.Invoke();
+        }
         private readonly List<Relic> _relics = new List<Relic>();
         private readonly IReadOnlyList<Relic> _relicsView;
 

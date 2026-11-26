@@ -70,6 +70,48 @@ namespace CNF.Data
     [CreateAssetMenu(fileName = "Monster_", menuName = "CNF/Data/MonsterDataSO")]
     public class MonsterDataSO : CustomParamContainerSO
     {
+        // 에디터와 테스트에서 같은 규칙으로 몬스터별 설정을 검사한다.
+        public List<string> ValidateConfiguration()
+        {
+            var errors = new List<string>();
+            var phases = GetEffectivePhases();
+            var patternIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            float previousThreshold = 1f;
+            for (int i = 0; i < phases.Count; i++)
+            {
+                var phase = phases[i];
+                if (phase == null) { errors.Add($"페이즈 {i + 1}이 비어 있습니다."); continue; }
+                if (i == 0 && phase.HPRatioThreshold != 1f)
+                    errors.Add("첫 페이즈의 체력 기준은 1이어야 합니다.");
+                if (phase.HPRatioThreshold > previousThreshold || phase.HPRatioThreshold < 0f)
+                    errors.Add($"{phase.PhaseName}: 체력 기준은 이전 페이즈 이하이고 0 이상이어야 합니다.");
+                previousThreshold = phase.HPRatioThreshold;
+                if (phase.Patterns == null || phase.Patterns.Count == 0)
+                {
+                    errors.Add($"{phase.PhaseName}: 패턴이 없습니다.");
+                    continue;
+                }
+                bool hasNormal = false;
+                foreach (var pattern in phase.Patterns)
+                {
+                    if (pattern == null) { errors.Add($"{phase.PhaseName}: 빈 패턴이 있습니다."); continue; }
+                    if (!pattern.IsSpecialPattern) hasNormal = true;
+                    if (string.IsNullOrWhiteSpace(pattern.PatternID) || !patternIds.Add(pattern.PatternID))
+                        errors.Add($"{phase.PhaseName}: 패턴 ID가 비었거나 중복됩니다 ({pattern.PatternID}).");
+                }
+                if (!hasNormal) errors.Add($"{phase.PhaseName}: 일반 패턴이 최소 1개 필요합니다.");
+            }
+            return errors;
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (string.IsNullOrEmpty(MonsterID)) return;
+            foreach (var error in ValidateConfiguration())
+                Debug.LogWarning($"몬스터 '{MonsterID}': {error}", this);
+        }
+#endif
         [Header("1. 기본 식별 정보")]
         public string MonsterID;
         public string MonsterName;
