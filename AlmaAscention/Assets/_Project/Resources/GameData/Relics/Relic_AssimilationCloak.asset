@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_AssimilationCloak
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: UnspecifiedRarityAndPrice
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: Implemented
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 1
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 3
+  - Key: ValueSource
+    Value: 
+  RelicID: AssimilationCloak
+  RelicName: "\uB3D9\uD654 \uB9DD\uD1A0"
+  Description: "획득 후 누적 3턴마다 해당 턴에 처음 사용한 카드의 선택 대상 한 명에게 취약 1을 부여하고 행동치 1을 회복한다. 대상이 살아 있어야 발동한다."
+  FlavorText: "\uC785\uC73C\uBA74 \uC8FC\uBCC0 \uC0AC\uBB3C\uC5D0 \uB3D9\uD654\uB418\uACE0 \uC18C\uB9AC\uAC00 \uC904\uC5B4\uB4DC\uB294 \uB9DD\uD1A0. \uD22C\uBA85\uD574\uC9C0\uB294 \uAC83\uC740 \uC544\uB2C8\uAE30\uC5D0 \uD3C9\uC9C0\uC5D0\uC11C\uB294 \uC798 \uBCF4\uC778\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 5
+  EffectKey: ApplyVulnerableToSelectedTarget
+  EffectValue: 1
+  StatusID: Vulnerable
+  StatusStacks: 1
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_ShadowSungrass
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: UnspecifiedRarityAndPrice
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: Turn
+  - Key: EffectImplementation
+    Value: Pending
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: "\uC774\uBBF8 \uAC15\uD654\uB41C \uCE74\uB4DC\uC758 \uD6C4\uBCF4 \uD3EC\uD568 \uC5EC\uBD80 \uD655\uC815 \uD544\uC694"
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 3
+  - Key: ValueSource
+    Value: 
+  RelicID: ShadowSungrass
+  RelicName: "\uADF8\uB9BC\uC790 \uC138\uACC4\uC758 \uD0DC\uC591\uCD08"
+  Description: "3\uD134\uB9C8\uB2E4 \uBB34\uC791\uC704 \uC190\uD328 \uC911 \uD558\uB098\uB97C \uADF8 \uD134\uB9CC \uAC15\uD654\uD55C\uB2E4."
+  FlavorText: "\uBE5B\uC774 \uC5C6\uB294 \uADF8\uB9BC\uC790 \uC138\uC0C1\uC5D0\uC11C \uAD11\uC6D0 \uC5ED\uD560\uC744 \uD558\uB294 \uD480. \uC798 \uAC00\uAFB8\uB294 \uAC83\uC5D0 \uB530\uB77C \uBE5B\uC758 \uC591\uC774 \uB2EC\uB77C\uC9C4\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: ShadowSungrass
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

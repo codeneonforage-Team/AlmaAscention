@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_WorldTreeSeed
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: UnspecifiedRarityAndPrice
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: RunSinceAcquisition
+  - Key: Duration
+    Value: UntilNextTurnOrBattleEnd
+  - Key: EffectImplementation
+    Value: Pending
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 3
+  - Key: ValueSource
+    Value: 
+  RelicID: WorldTreeSeed
+  RelicName: "\uC138\uACC4\uC218\uC758 \uC528\uC557"
+  Description: "\uD68D\uB4DD \uD6C4 \uB204\uC801 3\uD134\uB9C8\uB2E4 \uD134 \uC2DC\uC791\uC5D0 \uD574\uB2F9 \uD134\uC758 \uCD5C\uB300 \uD589\uB3D9\uCE58\uC640 \uD604\uC7AC \uD589\uB3D9\uCE58\uAC00 1 \uC99D\uAC00\uD55C\uB2E4. \uB2E4\uC74C \uD134 \uC2DC\uC791 \uC804 \uB610\uB294 \uC804\uD22C \uC885\uB8CC \uC2DC \uCD5C\uB300 \uD589\uB3D9\uCE58 \uBCF4\uB108\uC2A4\uB97C \uD574\uC81C\uD55C\uB2E4."
+  FlavorText: "\uC4F0\uB7EC\uC838\uAC00\uB294 \uC138\uACC4\uC218\uAC00 \uB0A8\uAE34 \uC528\uC557\uB4E4 \uC911 \uD558\uB098. \uC544\uC9C1\uB3C4 \uADF8 \uB530\uB73B\uD568\uC774 \uB0A8\uC544 \uC788\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: WorldTreeSeed
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_SpaceRecycleBin
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: SpaceRecycleBin
+  RelicName: "\uc6b0\uc8fc \uc7ac\ud65c\uc6a9 \ud1b5"
+  Description: "\uc804\ud22c \uc911 \uc138 \ubc88\uc9f8\ub9c8\ub2e4 \uc0ac\uc6a9\ud55c \uce74\ub4dc\ub97c \ub2e4\uc2dc \uc190\ud328\ub85c \ub418\ub3cc\ub9b0\ub2e4."
+  FlavorText: "\uc800 \uba38\ub098\uba3c \uc6b0\uc8fc\uc5d0\uc11c \uc678\uacc4\uc778\ub4e4\uc774 \uc4f0\ub358 \uc7ac\ud65c\uc6a9 \ud1b5. \ud568\ubd80\ub85c \ub2e4\ub8e8\uba74 \uc704\ud5d8\ud558\ub2e4\uace0 \ud55c\ub2e4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 2
+  EffectKey: RecycleEveryThirdCard
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

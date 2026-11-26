@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_BrokenBlackUmbrella
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: BrokenBlackUmbrella
+  RelicName: "\ubd80\uc11c\uc9c4 \uac80\uc740 \uc6b0\uc0b0"
+  Description: "\uc804\ud22c \uc2dc\uc791 \uc2dc \uc0b4\uc544 \uc788\ub294 \uc801 \uc804\uccb4\uc5d0\uac8c \uc57d\ud654 1\uc744 \ubd80\uc5ec\ud55c\ub2e4."
+  FlavorText: "\uacf3\uacf3\uc774 \ub9dd\uac00\uc9c0\uace0 \ud718\uace0 \uaebe\uc778 \uac80\uc740\uc0c9 \uc6b0\uc0b0. \uc4f0\uba74 \ub9d1\uc740 \ub0a0, \uc548 \uc4f0\uba74 \ube44 \uc624\ub294 \uc6b0\uc0b0\uc774\ub2e4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 2
+  EffectKey: ApplyWeakAll
+  EffectValue: 1
+  StatusID: Weak
+  StatusStacks: 1
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

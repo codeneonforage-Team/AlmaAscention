@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_MemoryAmulet
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: UnspecifiedRarityAndPrice
+  - Key: Character
+    Value: Onihime
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: Turn
+  - Key: EffectImplementation
+    Value: Implemented
+  - Key: FirstTurnOnly
+    Value: true
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: Self
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: MemoryAmulet
+  RelicName: "\uCD94\uC5B5\uC758 \uBD80\uC801"
+  Description: "\uC624\uB2C8\uD788\uBA54 \uACE0\uC720 \uACE0\uC815 \uC720\uBB3C. \uB9E4 \uC804\uD22C \uCCAB \uD134\uC5D0\uB9CC \uD798 +1. \uCCAB \uD134 \uC885\uB8CC \uB610\uB294 \uC804\uD22C \uC885\uB8CC \uC2DC \uBCF4\uB108\uC2A4\uB97C \uD68C\uC218\uD55C\uB2E4."
+  FlavorText: "\uC544\uBC84\uC9C0\uAC00 \uB3CC\uC544\uAC00\uC2DC\uAE30 \uC804 \uC190\uC5D0 \uC950\uC5B4\uC900 \uBD80\uC801... \uACE0\uD5A5\uC5D0\uC11C \uBA40\uB9AC \uB5A8\uC5B4\uC838 \uC788\uC5B4\uB3C4 \uB9C8\uC74C\uB9CC\uC740 \uADF8\uACF3\uC5D0 \uC788\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 0
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: ApplyStatus
+  EffectValue: 1
+  StatusID: Strength
+  StatusStacks: 1
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

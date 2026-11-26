@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_SteamTeapot
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: SteamTeapot
+  RelicName: "\uc99d\uae30 \ud2f0\ud3ec\ud2b8"
+  Description: "\uacfc\ubd80\ud558 \uc0c1\ud0dc\uc778 \uc190\ud328 \uce74\ub4dc\uc758 \ube44\uc6a9\uc744 1 \uc904\uc778\ub2e4."
+  FlavorText: "\uc800\uc808\ub85c \uc99d\uae30\ub97c \ub0b4\ubfdc\ub294 \ud2f0\ud3ec\ud2b8. \ub69c\uaed1\uc744 \uc5f4\uc5b4\ubcf4\uba74 \uc548\uc5d0\ub294 \uc544\ubb34\uac83\ub3c4 \uc5c6\ub2e4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: SteamTeapot
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

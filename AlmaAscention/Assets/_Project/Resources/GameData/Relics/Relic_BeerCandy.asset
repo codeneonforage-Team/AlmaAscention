@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_BeerCandy
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: BeerCandy
+  RelicName: "\ub9e5\uc8fc\ub9db \uc0ac\ud0d5"
+  Description: "\ud134 \uc885\ub8cc \uc2dc \uccb4\ub825\uc744 1 \ud68c\ubcf5\ud55c\ub2e4."
+  FlavorText: "\ub9e5\uc8fc \ubaa8\uc591\uc758 \ub178\ub780\uc0c9 \uc0ac\ud0d5. \ube68\uc544\ub3c4 \uc804\ud600 \ud06c\uae30\uac00 \uc904\uc5b4\ub4e4\uc9c0 \uc54a\ub294\ub2e4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 4
+  EffectKey: Heal
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

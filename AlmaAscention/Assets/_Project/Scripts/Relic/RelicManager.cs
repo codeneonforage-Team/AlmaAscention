@@ -5,41 +5,45 @@ using CNF.Data;
 
 namespace AlmaAscention.Relic
 {
-    public sealed class RelicManager
+    public sealed class RelicManager : IRelicBattleHooks
     {
         public sealed class Snapshot
         {
-            internal Relic[] Relics;
-            internal bool[] Expired;
-            internal int[] Cooldowns;
+            internal readonly Relic.CombatState[] Relics;
+            internal readonly int BattleTurnNumber;
+
+            internal Snapshot(RelicManager manager)
+            {
+                BattleTurnNumber = manager._battleTurnNumber;
+                Relics = new Relic.CombatState[manager._relics.Count];
+                for (int i = 0; i < manager._relics.Count; i++)
+                {
+                    Relics[i] = manager._relics[i].CaptureCombatState();
+                }
+            }
         }
 
         public Snapshot CaptureSnapshot()
         {
-            var snapshot = new Snapshot
-            {
-                Relics = _relics.ToArray(),
-                Expired = new bool[_relics.Count],
-                Cooldowns = new int[_relics.Count]
-            };
-            for (int i = 0; i < _relics.Count; i++)
-            {
-                snapshot.Expired[i] = _relics[i].IsExpired;
-                snapshot.Cooldowns[i] = _relics[i].RemainingCooldownBattles;
-            }
-            return snapshot;
+            return new Snapshot(this);
         }
 
         public void RestoreSnapshot(Snapshot snapshot)
         {
             _relics.Clear();
-            _relics.AddRange(snapshot.Relics);
-            for (int i = 0; i < _relics.Count; i++)
-                _relics[i].RestoreState(snapshot.Expired[i], snapshot.Cooldowns[i]);
+            foreach (Relic.CombatState state in snapshot.Relics)
+            {
+                state.Relic.RestoreCombatState(state);
+                _relics.Add(state.Relic);
+            }
+
+            _battleTurnNumber = snapshot.BattleTurnNumber;
+            // 획득·제거 API를 거치지 않으므로 보너스 재실행 없이 목록 복원 완료만 알린다.
             Changed?.Invoke();
         }
         private readonly List<Relic> _relics = new List<Relic>();
         private readonly IReadOnlyList<Relic> _relicsView;
+        private int _battleTurnNumber;
 
         public IReadOnlyList<Relic> Relics
         {
@@ -140,6 +144,7 @@ namespace AlmaAscention.Relic
             }
 
             _relics.Remove(relic);
+            relic.ClearTurnBonus();
             Changed?.Invoke();
 
             return true;
@@ -168,6 +173,7 @@ namespace AlmaAscention.Relic
                 }
 
                 _relics.Remove(relic);
+                relic.ClearTurnBonus();
                 removedCount++;
             }
 
@@ -182,6 +188,36 @@ namespace AlmaAscention.Relic
         #endregion
 
         #region 유물 발동
+
+        // 전투 쪽에서는 기존 TriggerRelics(OnTurnStart) 호출을 이 훅으로 대체한다.
+        // 두 경로를 함께 호출하면 턴 집계와 효과가 중복되므로 한 경로만 사용한다.
+        public int OnTurnStart(CombatContext context)
+        {
+            return TriggerRelics(ERelicTriggerType.OnTurnStart, context);
+        }
+
+        public int OnTurnEnd(CombatContext context)
+        {
+            return TriggerRelics(ERelicTriggerType.OnTurnEnd, context);
+        }
+
+        // 플레이어 카드 사용 성공마다 한 번 호출한다. 실패·취소 시에는 호출하지 않는다.
+        public int OnCardPlayed(CombatContext context)
+        {
+            return TriggerRelics(ERelicTriggerType.OnCardPlayed, context);
+        }
+
+        // 적 한 개체의 사망마다 한 번 호출한다. 대상·진영 판별은 호출자가 담당한다.
+        public int OnEnemyKilled(CombatContext context)
+        {
+            return TriggerRelics(ERelicTriggerType.OnEnemyKilled, context);
+        }
+
+        public void OnBattleEnd(CombatContext context)
+        {
+            // 기존 OnBattleFinished 호출을 대체한다. 함께 호출하면 쿨타임이 두 번 감소한다.
+            OnBattleFinished();
+        }
 
         // 효과 실행 중인 발동 시점.
         // 유물 효과가 같은 시점을 다시 일으키는 경우(예: 피격 시 자해) 무한 연쇄를 막기 위함.
@@ -209,21 +245,37 @@ namespace AlmaAscention.Relic
             }
 
             int executedCount = 0;
+            List<Relic> snapshot = new List<Relic>(_relics);
 
             try
             {
+                if (timing == ERelicTriggerType.OnTurnStart)
+                {
+                    _battleTurnNumber++;
+                }
+
                 // 효과 도중 획득·만료가 일어나도 이번 발동 대상은 호출 시점 기준으로 고정한다.
-                List<Relic> snapshot = new List<Relic>(_relics);
 
                 foreach (Relic relic in snapshot)
                 {
+                    if (timing == ERelicTriggerType.OnTurnStart && !relic.IsExpired && _relics.Contains(relic))
+                    {
+                        relic.AdvancePlayerTurn();
+                    }
+
+                    if (timing == ERelicTriggerType.OnCardPlayed && !relic.IsExpired && _relics.Contains(relic))
+                    {
+                        relic.RecordCardPlayed();
+                    }
+
                     // 앞선 효과로 만료·제거되었거나 전투 쿨타임 중인 유물은 건너뛴다.
                     if (relic.IsExpired || relic.IsOnCooldown || !_relics.Contains(relic))
                     {
                         continue;
                     }
 
-                    if (!CardExecutor.TryTriggerRelicEffect(relic.OriginalRelicData, timing, context))
+
+                    if (!relic.TryTrigger(timing, context, _battleTurnNumber))
                     {
                         continue;
                     }
@@ -235,6 +287,14 @@ namespace AlmaAscention.Relic
             }
             finally
             {
+                if (timing == ERelicTriggerType.OnTurnEnd)
+                {
+                    foreach (Relic relic in snapshot)
+                    {
+                        relic.EndTurn();
+                    }
+                }
+
                 _triggeringTimings.Remove(timing);
             }
 
@@ -244,8 +304,10 @@ namespace AlmaAscention.Relic
         // 전투 1회가 끝날 때마다 호출하여 쿨타임(CooldownBattles)이 걸린 유물의 남은 전투 횟수를 1씩 줄인다.
         public void OnBattleFinished()
         {
-            foreach (Relic relic in _relics)
+            _battleTurnNumber = 0;
+            foreach (Relic relic in new List<Relic>(_relics))
             {
+                relic.EndTurn();
                 relic.AdvanceBattleCooldown();
             }
         }

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_SmallestGuitar
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: SmallestGuitar
+  RelicName: "\uc138\uc0c1\uc5d0\uc11c \uc81c\uc77c \uc791\uc740 \uae30\ud0c0"
+  Description: "\uc801\uc744 \uc4f0\ub7ec\ub728\ub9ac\uba74 \uc0b4\uc544 \uc788\ub294 \ub2e4\ub978 \uc801 \uc804\uccb4\uc5d0\uac8c \ucde8\uc57d 1\uc744 \ubd80\uc5ec\ud55c\ub2e4."
+  FlavorText: "\uc815\ub9d0\ub85c \uc138\uc0c1\uc5d0\uc11c \uc81c\uc77c \uc791\uc740 \ud1b5\uae30\ud0c0. \ubc14\ub2e5\uc5d0 \uc2e4\uc218\ub85c \ub5a8\uc5b4\ub728\ub9ac\uba74 \ucc3e\uae30 \ud798\ub4e4\uc5b4 \ubcf4\uc778\ub2e4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 10
+  EffectKey: ApplyVulnerableOtherEnemies
+  EffectValue: 1
+  StatusID: Vulnerable
+  StatusStacks: 1
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_WedgeStake
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: UnspecifiedRarityAndPrice
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: Pending
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: Deferred
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: "\uBC1C\uB3D9 \uC2DC\uC810\uACFC \uBC18\uBCF5\uD560 \uD589\uB3D9 \uD655\uC815 \uD544\uC694"
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 3
+  - Key: ValueSource
+    Value: 
+  RelicID: WedgeStake
+  RelicName: "\uC410\uAE30 \uB9D0\uB69D"
+  Description: "3\uD134\uC5D0 \uD55C \uBC88 \uC801\uB4E4\uC758 \uB2E4\uC74C \uD589\uB3D9\uC744 \uBC18\uBCF5\uC2DC\uD0A8\uB2E4. \uC608: \uACF5\uACA9\uD558\uB824 \uD55C\uB2E4\uBA74 \uB2E4\uC74C \uD134\uC5D0\uB3C4 \uACF5\uACA9\uD558\uAC8C \uB41C\uB2E4."
+  FlavorText: "\uBA3C \uC61B\uB0A0 \uAC70\uC778\uC774 \uB300\uB959\uC744 \uB04C\uC5B4\uC11C \uD558\uB098\uB85C \uBAA8\uC744 \uB54C \uC4F4 \uACE0\uC815\uC6A9 \uB9D0\uB69D. \uC7AC\uC9C8\uC740 \uCCA0\uC5D0 \uAC00\uAE4C\uC6B4\uB370 \uB9D0\uB3C4 \uC548 \uB418\uAC8C \uAC00\uBCCD\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: WedgeStake
+  EffectValue: 0
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []
