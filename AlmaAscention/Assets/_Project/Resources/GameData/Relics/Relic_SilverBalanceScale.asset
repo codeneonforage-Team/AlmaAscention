@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_SilverBalanceScale
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: SilverBalanceScale
+  RelicName: "\uC7BF\uBE5B \uC740 \uC591\uCE6D\uC800\uC6B8"
+  Description: "\uD53C\uACA9 \uD6C4 \uD50C\uB808\uC774\uC5B4 \uCCB4\uB825\uC774 10% \uBBF8\uB9CC\uC774 \uB418\uBA74 \uD544\uB4DC\uC5D0 \uC788\uB294 \uBAA8\uB4E0 \uC0DD\uC874 \uAC1C\uCCB4\uC758 \uCCB4\uB825\uC744 \uD569\uC0B0\uD55C \uB4A4 \uADE0\uB4F1\uD558\uAC8C \uB098\uB208\uB2E4. (\uC804\uD22C 5\uD68C \uCFE8\uD0C0\uC784)"
+  FlavorText: "\uC740\uC73C\uB85C \uB9CC\uB4E0 \uC800\uC6B8. \uC774\uC0C1\uD558\uAC8C \uC88C\uC6B0\uC5D0 \uBB34\uC5C7\uC744 \uC62C\uB824\uB3C4 \uBCC0\uD558\uC9C0 \uC54A\uB294\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 2
+  ShopPrice: 150
+  TriggerType: 7
+  EffectKey: SilverBalanceScale
+  EffectValue: 10
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 5
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

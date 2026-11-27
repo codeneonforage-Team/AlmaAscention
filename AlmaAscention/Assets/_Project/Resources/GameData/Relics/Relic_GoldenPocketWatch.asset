@@ -16,7 +16,7 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
@@ -34,16 +34,16 @@ MonoBehaviour:
   - Key: ManaGain
     Value: 
   - Key: PendingRules
-    Value: ""
+    Value: 
   - Key: Target
     Value: "Hand"
   - Key: TurnInterval
-    Value: 3
+    Value: "3"
   - Key: ValueSource
     Value: 
   RelicID: GoldenPocketWatch
   RelicName: "\uD669\uAE08 \uD68C\uC911\uC2DC\uACC4"
-  Description: "획득 후 누적 3턴마다 턴 시작 드로우 이후 발동 당시 손패의 비용을 해당 턴 동안 0으로 만든다. 이후 뽑은 카드는 제외하며 턴 종료 또는 전투 종료 시 해제한다."
+  Description: "\uD68D\uB4DD \uD6C4 \uB204\uC801 3\uD134\uB9C8\uB2E4 \uD134 \uC2DC\uC791 \uB4DC\uB85C\uC6B0 \uC774\uD6C4 \uBC1C\uB3D9 \uB2F9\uC2DC \uC190\uD328\uC758 \uBE44\uC6A9\uC744 \uD574\uB2F9 \uD134 \uB3D9\uC548 0\uC73C\uB85C \uB9CC\uB4E0\uB2E4. \uC774\uD6C4 \uBF51\uC740 \uCE74\uB4DC\uB294 \uC81C\uC678\uD558\uBA70 \uD134 \uC885\uB8CC \uB610\uB294 \uC804\uD22C \uC885\uB8CC \uC2DC \uD574\uC81C\uD55C\uB2E4."
   FlavorText: "\uC2DC\uAC04\uC758 \uD750\uB984\uC744 \uC870\uC791\uD560 \uC218 \uC788\uB294 \uB300\uB2E8\uD55C \uC2DC\uACC4. \uD750\uB974\uB294 \uC2DC\uAC04\uC740 \uD604\uC7AC \uC2DC\uAC04\uC774 \uC544\uB2CC \uC790\uC2E0\uC758 \uC2DC\uAC04\uC744 \uB098\uD0C0\uB0B4\uAE30\uC5D0 \uC2DC\uACC4\uC6A9\uB3C4\uB85C \uC4F8 \uC218 \uC5C6\uB2E4."
   Icon: {fileID: 0}
   Rarity: 1

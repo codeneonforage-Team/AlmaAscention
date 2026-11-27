@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_EightTrigramsGlove
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: EightTrigramsGlove
+  RelicName: "\uD314\uAD18\uB85C \uC7A5\uAC11"
+  Description: "\uC190\uD328\uC758 \uCE74\uB4DC\uB97C \uBAA8\uB450 \uC18C\uBAA8\uD574 \uC190\uD328\uAC00 \uBE44\uC5C8\uC744 \uB54C \uC0B4\uC544 \uC788\uB294 \uC801 \uC804\uCCB4\uC5D0\uAC8C \uD53C\uD574\uB97C 40 \uAC00\uD55C\uB2E4. (\uC804\uD22C 12\uD68C \uCFE8\uD0C0\uC784)"
+  FlavorText: "\uC7A5\uAC11 \uC190\uBC14\uB2E5 \uC911\uC559 \uBD80\uBD84\uC5D0 \uD314\uAD18\uB85C\uC758 \uBB38\uC591\uC774 \uBC15\uD78C \uC7A5\uAC11. \uD761\uC785-\uBD84\uC1C4-\uC5F0\uC18C 3\uAC00\uC9C0 \uACFC\uC815\uC744 \uAC70\uCCD0 \uC804\uBC29\uC5D0 \uC788\uB294 \uBAA8\uB4E0 \uAC83\uC744 \uC18C\uBA78\uC2DC\uD0A8\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 3
+  ShopPrice: 150
+  TriggerType: 12
+  EffectKey: EightTrigramsGlove
+  EffectValue: 40
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 12
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

@@ -142,6 +142,16 @@ namespace CNF.Data
             return true;
         }
 
+        /// <summary>
+        /// [3번 그림자 세계의 태양초 연동]: 해당 턴 동안만 임시 강화했던 카드를 턴 종료 시 원래 미강화 상태로 되돌립니다.
+        /// </summary>
+        internal void RevertTemporaryUpgrade()
+        {
+            if (!_isUpgraded) return;
+            _isUpgraded = false;
+            OnCardStateChanged?.Invoke(this);
+        }
+
         public void SetEnchantment(string enchantmentId)
         {
             _enchantmentId = enchantmentId ?? EnchantmentKeys.None;

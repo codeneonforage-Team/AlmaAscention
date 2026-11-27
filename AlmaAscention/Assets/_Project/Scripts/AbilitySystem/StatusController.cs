@@ -529,6 +529,21 @@ namespace CNF.AbilitySystem
             OnManaChanged?.Invoke(_currentMana, _maxMana);
         }
 
+        /// <summary>
+        /// [1번 세계수의 씨앗 연동]: 최대 행동치(MaxMana)를 증감하고, 옵션에 따라 현재 행동치도 함께 회복합니다.
+        /// </summary>
+        public void ModifyMaxMana(int delta, bool alsoGainCurrentMana = false)
+        {
+            if (delta == 0) return;
+            _maxMana = Mathf.Max(0, _maxMana + delta);
+            if (alsoGainCurrentMana && delta > 0)
+                _currentMana = Mathf.Max(0, _currentMana + delta);
+            else if (delta < 0)
+                _currentMana = Mathf.Min(_currentMana, _maxMana);
+
+            OnManaChanged?.Invoke(_currentMana, _maxMana);
+        }
+
         public void RefillTurnMana()
         {
             _currentMana = _maxMana;

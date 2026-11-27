@@ -71,6 +71,19 @@ namespace AlmaAscention.Combat
         {
             if (_brain == null || Status == null) return;
 
+            // 8번 쐐기 말뚝 연동: LockNextIntentOnce 상태가 걸려 있으면 이번 턴 행동을 다음 턴에도 그대로 반복
+            int lockStacks = Status.GetStatus(StatusKeys.LockNextIntentOnce);
+            if (CurrentIntent != null && lockStacks > 0)
+            {
+                Status.SetStatus(StatusKeys.LockNextIntentOnce, lockStacks - 1);
+                string lockedKey = !string.IsNullOrEmpty(CurrentIntent.PatternID) ? CurrentIntent.PatternID : CurrentIntent.PatternName;
+                if (!string.IsNullOrEmpty(lockedKey))
+                    _seenPatternIds.Add(lockedKey);
+                Status.SetStatus(StatusKeys.RepeatActionMark, 1);
+                OnIntentChanged?.Invoke(this);
+                return;
+            }
+
             float ratio = Status.MaxHP > 0 ? (float)Status.CurrentHP / Status.MaxHP : 0f;
             CurrentIntent = _brain.SelectNextPattern(ratio);
 

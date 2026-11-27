@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_GoldenFeather
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: GoldenFeather
+  RelicName: "\uD669\uAE08\uC0C9 \uAE43\uD138"
+  Description: "\uCE74\uB4DC \uBCF4\uC0C1\uACFC \uC0C1\uC810\uC5D0\uC11C \uD76C\uADC0 \uCE74\uB4DC\uC758 \uCD94\uCCA8 \uAC00\uC911\uCE58\uB97C 2.5\uBC30\uB85C \uB192\uC778\uB2E4."
+  FlavorText: "\uD669\uAE08\uBE5B\uC774 \uD758\uB7EC\uB098\uC624\uB294 \uC2E0\uBE44\uC758 \uAE43\uD138. \uD0DC\uC591\uBE5B\uC5D0 \uB9D0\uB824\uB454 \uC774\uBD88 \uB0C4\uC0C8\uAC00 \uB09C\uB2E4."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 0
+  EffectKey: RareCardWeight
+  EffectValue: 250
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

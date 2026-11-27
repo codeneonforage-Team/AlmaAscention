@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_RustedDagger
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: RustedDagger
+  RelicName: "\uB179\uC2A8 \uB2E8\uAC80"
+  Description: "\uB3C5 \uC0C1\uD0DC\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD53C\uD574\uAC00 3\uBC30\uAC00 \uB41C\uB2E4."
+  FlavorText: "\uAC08\uC0C9\uACFC \uB179\uC0C9\uBE5B\uC774 \uAC10\uB3C4\uB294 \uC624\uB798\uB41C \uB4EF\uD55C \uB179\uC2A8 \uB2E8\uAC80. \uB9CC\uC9C0\uACE0 \uB09C \uB4A4 \uC190\uC5D0\uC11C \uD53C\uB0C4\uC0C8\uAC00 \uB09C\uB2E4... (\uC0AC\uC6A9 \uD6C4 \uAF2D \uC190\uC744 \uC53B\uC744 \uAC83)"
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 2
+  EffectKey: RustedDagger
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

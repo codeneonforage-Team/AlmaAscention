@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
   CustomParams:
   - Key: AdditionalStatusIDs
-    Value: Vulnerable
+    Value: "Vulnerable"
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
@@ -26,7 +26,7 @@ MonoBehaviour:
   - Key: Duration
     Value: 
   - Key: EffectImplementation
-    Value: Implemented
+    Value: "Implemented"
   - Key: FirstTurnOnly
     Value: 
   - Key: ImplementationStatus
@@ -36,9 +36,9 @@ MonoBehaviour:
   - Key: PendingRules
     Value: 
   - Key: Target
-    Value: AllEnemies
+    Value: "AllEnemies"
   - Key: TurnInterval
-    Value: 3
+    Value: "3"
   - Key: ValueSource
     Value: 
   RelicID: BrokenMask

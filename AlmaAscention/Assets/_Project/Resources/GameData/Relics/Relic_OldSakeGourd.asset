@@ -16,17 +16,17 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
-    Value: 3
+    Value: "3"
   - Key: CounterScope
     Value: 
   - Key: Duration
     Value: 
   - Key: EffectImplementation
-    Value: Implemented
+    Value: "Implemented"
   - Key: FirstTurnOnly
     Value: 
   - Key: ImplementationStatus

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_Kyklonomicon
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: Kyklonomicon
+  RelicName: "\uD034\uD074\uB85C\uB178\uBBF8\uCF58"
+  Description: "\uC804\uD22C \uC2DC\uC791 \uC2DC \uC801\uC758 \uCCB4\uB825\uC744 \uC808\uBC18\uC73C\uB85C \uC904\uC774\uACE0 \uC790\uC2E0\uC758 \uCCB4\uB825\uC744 \uCD5C\uB300 \uCCB4\uB825\uC758 50%\uB9CC\uD07C \uD68C\uBCF5\uD55C\uB2E4. \uACF5\uACA9 \uC801\uC911 \uC2DC \uCDE8\uC57D\uACFC \uC57D\uD654\uB97C 1 \uBD80\uC5EC\uD558\uC9C0\uB9CC, 4\uD134\uC9F8 \uC885\uB8CC\uBD80\uD130 \uC804\uD22C\uAC00 \uB05D\uB0A0 \uB54C\uAE4C\uC9C0 \uB9E4 \uD134 \uCD5C\uB300 \uCCB4\uB825\uC774 10\uC529 \uAC10\uC18C\uD55C\uB2E4."
+  FlavorText: "\uCE21\uC815 \uBD88\uAC00\uC758 \uC2DC\uB300 \uB54C \uC874\uC7AC\uD558\uB358 [\uC724\uD68C\u00B7\uC9D1\uCC29\u00B7\uAD11\uAE30\u00B7\uB9CC\uBB3C\u00B7\uC9C0\uC2DD]\uC744 \uB2F4\uC740 \uCC45 \uD615\uD0DC\uC758 \uC720\uBB3C. \uC790\uACA9 \uC788\uB294 \uC790\uB9CC \uC5F4\uACE0 \uC77D\uC744 \uC218 \uC788\uC73C\uBA70 \uC77D\uB294 \uC790\uC5D0\uAC8C \uC7AC\uC559 \uAC19\uC740 \uCD95\uBCF5\uC744 \uC900\uB2E4\uACE0 \uD55C\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 4
+  ShopPrice: 150
+  TriggerType: 2
+  EffectKey: Kyklonomicon
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

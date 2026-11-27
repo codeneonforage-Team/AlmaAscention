@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_ShurikenNecklace
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: "BeastRogue"
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: "true"
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: ShurikenNecklace
+  RelicName: "\uC218\uB9AC\uAC80 \uD615\uD0DC\uC758 \uBAA9\uAC78\uC774"
+  Description: "\uC218\uC778\uB3C4\uC801 \uACE0\uC720 \uACE0\uC815 \uC720\uBB3C. \uB9E4 \uC804\uD22C \uCCAB \uD134\uC5D0 \uD589\uB3D9\uCE58\uB97C 1 \uC5BB\uB294\uB2E4."
+  FlavorText: "\uBC1C\uACAC\uD588\uC744 \uB54C\uBD80\uD130 \uBAA9\uC5D0 \uAC78\uB824 \uC788\uB358 \uC218\uB9AC\uAC80\uC744 \uC774\uC6A9\uD574 \uB9CC\uB4E0 \uBAA9\uAC78\uC774. \uC870\uAE08 \uC624\uB798\uB3FC\uC11C \uBB49\uB69D\uD574\uC84C\uC9C0\uB9CC \uC790\uAE30\uAC00 \uBCF4\uAE30\uC5D0\uB294 \uC5EC\uC804\uD788 \uB458\uB3C4 \uC5C6\uB294 \uBCF4\uBB3C\uC774\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 0
+  ShopPrice: 150
+  TriggerType: 3
+  EffectKey: GainMana
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

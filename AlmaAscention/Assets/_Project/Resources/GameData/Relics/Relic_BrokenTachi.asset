@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_BrokenTachi
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: BrokenTachi
+  RelicName: "\uBD80\uB7EC\uC9C4 \uD0C0\uCE58"
+  Description: "\uD589\uB3D9\uCE58\uAC00 0\uC774 \uB420 \uB54C\uB9C8\uB2E4 \uC0B4\uC544 \uC788\uB294 \uC801 \uC804\uCCB4\uC5D0\uAC8C \uD53C\uD574\uB97C 12 \uAC00\uD55C\uB2E4."
+  FlavorText: "\uC6D0\uB798\uB294 3\uBBF8\uD130 \uC774\uC0C1\uC778 \uC77C\uBCF8\uB3C4\uC600\uC73C\uB098 \uC9C0\uAE08\uC740 \uBD80\uB7EC\uC838\uC11C \uB2E8\uAC80 \uC218\uC900\uC774\uB2E4. \uD718\uB450\uB97C \uB54C\uB9C8\uB2E4 \uBB18\uD558\uAC8C \uACF5\uAE30\uAC00 \uB5A8\uB9AC\uB294 \uC18C\uB9AC\uAC00 \uB4E4\uB9B0\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 1
+  ShopPrice: 150
+  TriggerType: 11
+  EffectKey: BrokenTachi
+  EffectValue: 12
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

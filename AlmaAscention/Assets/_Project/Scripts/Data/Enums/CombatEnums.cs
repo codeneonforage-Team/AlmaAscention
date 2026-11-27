@@ -158,6 +158,7 @@ namespace CNF.Data
         public const string KyklonomiconCurse        = "KyklonomiconCurse";        // 퀴클로노미콘(30번): 4턴 내 미처치 시 턴 종료마다 최대체력 10 감소 카운터
         public const string RecycleEveryThirdCard    = "RecycleEveryThirdCard";    // 우주 재활용 통(11번): 3번째마다 사용한 카드를 다시 손패로 복귀
         public const string PlayedCardCounter        = "PlayedCardCounter";        // 우주 재활용 통(11번) 연동용: 이번 전투에서 사용한 카드 누적 카운터
+        public const string LockNextIntentOnce       = "LockNextIntentOnce";       // 쐐기 말뚝(8번): 적의 다음 턴 행동 의도를 현재 행동으로 1회 반복 고정
 
         // 추후 세부 효과 확정 시 StatusBehaviorSO 또는 StatusController에 연결할 예약 상태이상 키
         public const string Whirlwind                = "Whirlwind";                // 금으로 도금된 클로(35번): [회오리] 상태 (예약 키)
@@ -170,7 +171,7 @@ namespace CNF.Data
             LoseStrengthAtTurnEnd, LoseDexterityAtTurnEnd,
             GrowingPoison, VulnerableDoubleDamage, FullHpDoubleDamage, RepeatIntentDoubleDamage, RepeatActionMark,
             PoisonTargetTripleDamage, DispelTargetOnAttack, InflictWeakVulnOnAttack, KyklonomiconCurse,
-            RecycleEveryThirdCard, PlayedCardCounter,
+            RecycleEveryThirdCard, PlayedCardCounter, LockNextIntentOnce,
             Whirlwind, Evasion
         };
 

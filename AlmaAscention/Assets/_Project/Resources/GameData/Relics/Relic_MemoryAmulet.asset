@@ -16,19 +16,19 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
-    Value: Onihime
+    Value: "Onihime"
   - Key: CooldownTurns
     Value: 
   - Key: CounterScope
     Value: 
   - Key: Duration
-    Value: Turn
+    Value: "Turn"
   - Key: EffectImplementation
-    Value: Implemented
+    Value: "Implemented"
   - Key: FirstTurnOnly
-    Value: true
+    Value: "true"
   - Key: ImplementationStatus
     Value: 
   - Key: ManaGain
@@ -36,7 +36,7 @@ MonoBehaviour:
   - Key: PendingRules
     Value: 
   - Key: Target
-    Value: Self
+    Value: "Self"
   - Key: TurnInterval
     Value: 
   - Key: ValueSource

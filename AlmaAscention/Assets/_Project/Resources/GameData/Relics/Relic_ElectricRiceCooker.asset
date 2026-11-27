@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_ElectricRiceCooker
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: ElectricRiceCooker
+  RelicName: "\uC804\uAE30\uBC25\uC1A5"
+  Description: "\uD134 \uC885\uB8CC \uC2DC \uCCB4\uB825\uC774 10% \uBBF8\uB9CC\uC778 \uC801\uC744 \uC989\uC2DC \uCC98\uCE58\uD55C\uB2E4. (\uC804\uD22C 6\uD68C \uCFE8\uD0C0\uC784)"
+  FlavorText: "\uC5B4\uB290 \uB300\uB9C8\uC655\uC744 \uBD09\uC778\uD558\uAE30 \uC704\uD574 \uC0AC\uC6A9\uB41C \uBC25\uC1A5. \uBB3C\uB860 \uBC25 \uC9D3\uB294 \uAE30\uB2A5\uB3C4 \uC874\uC7AC\uD55C\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 3
+  ShopPrice: 150
+  TriggerType: 4
+  EffectKey: ElectricRiceCooker
+  EffectValue: 10
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 6
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

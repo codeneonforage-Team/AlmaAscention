@@ -16,17 +16,17 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
     Value: 
   - Key: CounterScope
-    Value: RunSinceAcquisition
+    Value: "RunSinceAcquisition"
   - Key: Duration
-    Value: UntilNextTurnOrBattleEnd
+    Value: "UntilNextTurnOrBattleEnd"
   - Key: EffectImplementation
-    Value: Pending
+    Value: "Implemented"
   - Key: FirstTurnOnly
     Value: 
   - Key: ImplementationStatus
@@ -38,7 +38,7 @@ MonoBehaviour:
   - Key: Target
     Value: 
   - Key: TurnInterval
-    Value: 3
+    Value: "3"
   - Key: ValueSource
     Value: 
   RelicID: WorldTreeSeed

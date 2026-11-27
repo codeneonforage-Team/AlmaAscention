@@ -674,6 +674,33 @@ namespace CNF.AbilitySystem
                     caster.GainMana(1);
                     executed = true;
                 }
+                else if (string.Equals(effectKey, "PortableFurnace", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 10번 휴대용 용광로: 과부하 카드는 턴마다 강화(+EffectValue), 비과부하 카드는 약화(-StatusStacks)
+                    if (context.DeckOps is AlmaAscention.Deck.BattleDeckManager furnaceDeck && furnaceDeck.HandCards.Count > 0)
+                    {
+                        int overloadBonus = relicData.EffectValue > 0 ? relicData.EffectValue : 2;
+                        int penalty = relicData.StatusStacks > 0 ? relicData.StatusStacks : 1;
+                        ApplyPortableFurnaceOverloadScaling(furnaceDeck.HandCards, overloadBonus, penalty);
+                        executed = true;
+                    }
+                }
+                else if (string.Equals(effectKey, "SteamTeapot", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 12번 증기 티포트: 과부하 상태인 손패 카드의 코스트 감소
+                    if (context.DeckOps is AlmaAscention.Deck.BattleDeckManager teapotDeck && teapotDeck.HandCards.Count > 0)
+                    {
+                        int reduction = relicData.EffectValue > 0 ? relicData.EffectValue : 1;
+                        ApplySteamTeapotOverloadDiscount(teapotDeck.HandCards, reduction);
+                        executed = true;
+                    }
+                }
+                else if (string.Equals(effectKey, "WedgeStake", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 8번 쐐기 말뚝: 적들의 다음 턴 행동 의도를 현재 예고된 행동으로 1회 반복 고정
+                    if (ApplyStatusByTargetType(StatusKeys.LockNextIntentOnce, 1, ECardTarget.AllEnemies, context))
+                        executed = true;
+                }
             }
 
             // 전용 EffectKey에 해당하지 않는 일반 상태이상 부여 유물 폴백 처리

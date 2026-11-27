@@ -158,7 +158,6 @@ namespace AlmaAscention.Combat
             Player.RefillTurnMana();
             DeckManager.Draw(HandSize);
             TriggerRelics(ERelicTriggerType.OnTurnStart);
-            ApplyOverloadRelicsToHandIfOwned();
 
             SetState(EBattleState.PlayerTurn);
             if (!CheckBattleEnd()) CaptureTurnStart();
@@ -502,15 +501,6 @@ namespace AlmaAscention.Combat
         {
             if (RelicManager == null || Player == null || !Player.IsAlive) return;
             RelicManager.TriggerRelics(timing, BuildContext(primaryTarget));
-        }
-
-        private void ApplyOverloadRelicsToHandIfOwned()
-        {
-            if (RelicManager == null || DeckManager == null) return;
-            if (RelicManager.FindRelicOrNull("PortableFurnace") != null)
-                CardExecutor.ApplyPortableFurnaceOverloadScaling(DeckManager.HandCards);
-            if (RelicManager.FindRelicOrNull("SteamTeapot") != null)
-                CardExecutor.ApplySteamTeapotOverloadDiscount(DeckManager.HandCards);
         }
 
         private void Log(string message)

@@ -49,6 +49,10 @@ namespace CNF.Data.Editor
 
             if (_cardCsv == null)
                 _cardCsv = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Scripts/Data/SampleCards.csv");
+            if (_relicCsv == null)
+                _relicCsv = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Scripts/Data/SampleRelic.csv");
+            if (_potionCsv == null)
+                _potionCsv = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Project/Scripts/Data/SamplePotions.csv");
         }
 
         private static TextAsset LoadSavedCsv(string prefKey)

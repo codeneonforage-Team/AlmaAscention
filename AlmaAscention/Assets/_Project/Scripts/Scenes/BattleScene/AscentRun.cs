@@ -125,7 +125,7 @@ public sealed class AscentRun
         if (!won || HP == 0) { State = AscentState.Defeated; return; }
         Gold += Current.VictoryGold;
         if (DataManager.Instance != null)
-            rewardCards.AddRange(DataManager.Instance.GetRandomCards(2));
+            rewardCards.AddRange(DataManager.Instance.GetRandomCards(2, rareWeightMultiplier: GetRareCardWeightMultiplier()));
         RewardPending = rewardCards.Count > 0;
         if (!RewardPending) Advance();
     }
@@ -135,12 +135,23 @@ public sealed class AscentRun
         if (!RewardPending || RemainingRewardRerolls <= 0 || DataManager.Instance == null) return false;
         var excluded = new List<string>();
         foreach (var card in rewardCards) excluded.Add(card.CardID);
-        var next = DataManager.Instance.GetRandomCards(rewardCards.Count, excludeCardIds: excluded);
+        var next = DataManager.Instance.GetRandomCards(
+            rewardCards.Count,
+            excludeCardIds: excluded,
+            rareWeightMultiplier: GetRareCardWeightMultiplier());
         if (next.Count == 0) return false;
         rewardCards.Clear();
         rewardCards.AddRange(next);
         RemainingRewardRerolls--;
         return true;
+    }
+
+    private float GetRareCardWeightMultiplier()
+    {
+        var feather = Relics.FindRelicOrNull("GoldenFeather");
+        if (feather == null || feather.IsExpired) return 1f;
+        int pct = feather.OriginalRelicData != null ? feather.OriginalRelicData.EffectValue : 250;
+        return pct > 0 ? pct / 100f : 2.5f;
     }
 
     public bool TryTakeReward(int index, out CardInstance card)

@@ -16,7 +16,7 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
@@ -24,9 +24,9 @@ MonoBehaviour:
   - Key: CounterScope
     Value: 
   - Key: Duration
-    Value: Turn
+    Value: "Turn"
   - Key: EffectImplementation
-    Value: Pending
+    Value: "Implemented"
   - Key: FirstTurnOnly
     Value: 
   - Key: ImplementationStatus
@@ -34,16 +34,16 @@ MonoBehaviour:
   - Key: ManaGain
     Value: 
   - Key: PendingRules
-    Value: "\uC774\uBBF8 \uAC15\uD654\uB41C \uCE74\uB4DC\uC758 \uD6C4\uBCF4 \uD3EC\uD568 \uC5EC\uBD80 \uD655\uC815 \uD544\uC694"
+    Value: 
   - Key: Target
     Value: 
   - Key: TurnInterval
-    Value: 3
+    Value: "3"
   - Key: ValueSource
     Value: 
   RelicID: ShadowSungrass
   RelicName: "\uADF8\uB9BC\uC790 \uC138\uACC4\uC758 \uD0DC\uC591\uCD08"
-  Description: "3\uD134\uB9C8\uB2E4 \uBB34\uC791\uC704 \uC190\uD328 \uC911 \uD558\uB098\uB97C \uADF8 \uD134\uB9CC \uAC15\uD654\uD55C\uB2E4."
+  Description: "\uD68D\uB4DD \uD6C4 \uB204\uC801 3\uD134\uB9C8\uB2E4 \uBB34\uC791\uC704 \uBBF8\uAC15\uD654 \uC190\uD328 \uC911 \uD558\uB098\uB97C \uADF8 \uD134\uB9CC \uAC15\uD654\uD55C\uB2E4."
   FlavorText: "\uBE5B\uC774 \uC5C6\uB294 \uADF8\uB9BC\uC790 \uC138\uC0C1\uC5D0\uC11C \uAD11\uC6D0 \uC5ED\uD560\uC744 \uD558\uB294 \uD480. \uC798 \uAC00\uAFB8\uB294 \uAC83\uC5D0 \uB530\uB77C \uBE5B\uC758 \uC591\uC774 \uB2EC\uB77C\uC9C4\uB2E4."
   Icon: {fileID: 0}
   Rarity: 1

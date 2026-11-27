@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d21596ac1119bea48a210bb2856c3caa, type: 3}
+  m_Name: Relic_NumberOneDrinkHat
+  m_EditorClassIdentifier: Assembly-CSharp::CNF.Data.RelicDataSO
+  CustomParams:
+  - Key: AdditionalStatusIDs
+    Value: 
+  - Key: BalanceStatus
+    Value: "UnspecifiedRarityAndPrice"
+  - Key: Character
+    Value: 
+  - Key: CooldownTurns
+    Value: 
+  - Key: CounterScope
+    Value: 
+  - Key: Duration
+    Value: 
+  - Key: EffectImplementation
+    Value: "Implemented"
+  - Key: FirstTurnOnly
+    Value: 
+  - Key: ImplementationStatus
+    Value: 
+  - Key: ManaGain
+    Value: 
+  - Key: PendingRules
+    Value: 
+  - Key: Target
+    Value: 
+  - Key: TurnInterval
+    Value: 
+  - Key: ValueSource
+    Value: 
+  RelicID: NumberOneDrinkHat
+  RelicName: "\uB118\uBC84\uC6D0\uC758 \uC74C\uB8CC\uC218 \uBAA8\uC790"
+  Description: "\uC5F0\uC18D\uC73C\uB85C \uC804\uD22C\uB97C \uC9C4\uD589\uD560 \uB54C(2\uC5F0\uC18D \uC804\uD22C\uBD80\uD130) \uB204\uC801 \uD69F\uC218\uC5D0 \uBE44\uB840\uD574 \uD798\u00B7\uBC29\uC5B4\uB3C4\u00B7\uD589\uB3D9\uCE58 \uBC84\uD504\uB97C \uC5BB\uB294\uB2E4. \uC804\uD22C \uC678 \uACBD\uB85C\uB85C \uC774\uB3D9\uD558\uBA74 \uC5F0\uC18D \uAE30\uB85D\uC774 \uCD08\uAE30\uD654\uB41C\uB2E4."
+  FlavorText: "\uB118\uBC84\uC6D0 \uC911\uC758 \uB118\uBC84\uC6D0\uC744 \uAE30\uB9AC\uB294 \uBAA8\uC790. \uBB54\uAC00 \uBF1B\uAC00\uB8E8 \uAC19\uC740 \uAC8C \uC794\uB729 \uBB3B\uC5B4 \uC788\uB2E4..."
+  Icon: {fileID: 0}
+  Rarity: 2
+  ShopPrice: 150
+  TriggerType: 2
+  EffectKey: NumberOneDrinkHat
+  EffectValue: 1
+  StatusID: 
+  StatusStacks: 0
+  AcquireMaxHealthBonus: 0
+  AcquireHealBonus: 0
+  AcquireGoldBonus: 0
+  IsTimedRelic: 0
+  TimedDurationFloors: 0
+  CooldownBattles: 0
+  IsRecipeExclusive: 0
+  FusionIngredientIDs: []

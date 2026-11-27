@@ -19,6 +19,9 @@ namespace AlmaAscention.Relic
             public readonly int CooldownTurns, CooldownBattles, CardsPlayedThisTurn;
             internal readonly (StatusController Owner, string StatusId, int Amount)[] TurnBonuses;
             internal readonly (CardInstance Card, int PreviousCost, int AppliedCost)[] TurnCosts;
+            internal readonly CardInstance[] TurnUpgradedCards;
+            internal readonly StatusController TurnMaxManaOwner;
+            internal readonly int TurnMaxManaBonus;
             internal readonly bool ActivatedThisTurn;
 
             public CombatState(Relic relic)
@@ -31,6 +34,9 @@ namespace AlmaAscention.Relic
                 CardsPlayedThisTurn = relic._cardsPlayedThisTurn;
                 TurnBonuses = relic._turnBonuses.ToArray();
                 TurnCosts = relic._turnCosts.ToArray();
+                TurnUpgradedCards = relic._turnUpgradedCards.ToArray();
+                TurnMaxManaOwner = relic._turnMaxManaOwner;
+                TurnMaxManaBonus = relic._turnMaxManaBonus;
                 ActivatedThisTurn = relic._activatedThisTurn;
             }
         }
@@ -58,6 +64,11 @@ namespace AlmaAscention.Relic
             _turnBonuses.AddRange(state.TurnBonuses);
             _turnCosts.Clear();
             _turnCosts.AddRange(state.TurnCosts);
+            _turnUpgradedCards.Clear();
+            if (state.TurnUpgradedCards != null)
+                _turnUpgradedCards.AddRange(state.TurnUpgradedCards);
+            _turnMaxManaOwner = state.TurnMaxManaOwner;
+            _turnMaxManaBonus = state.TurnMaxManaBonus;
             _activatedThisTurn = state.ActivatedThisTurn;
         }
 
@@ -71,6 +82,9 @@ namespace AlmaAscention.Relic
         private bool _activatedThisTurn;
         private readonly List<(StatusController Owner, string StatusId, int Amount)> _turnBonuses = new List<(StatusController, string, int)>();
         private readonly List<(CardInstance Card, int PreviousCost, int AppliedCost)> _turnCosts = new List<(CardInstance, int, int)>();
+        private readonly List<CardInstance> _turnUpgradedCards = new List<CardInstance>();
+        private StatusController _turnMaxManaOwner;
+        private int _turnMaxManaBonus;
 
         internal void AdvancePlayerTurn()
         {
@@ -153,6 +167,14 @@ namespace AlmaAscention.Relic
             {
                 executed = ApplyVulnerableToSelectedTarget(context);
             }
+            else if (string.Equals(key, "WorldTreeSeed", StringComparison.OrdinalIgnoreCase))
+            {
+                executed = ApplyWorldTreeSeedManaBonus(context);
+            }
+            else if (string.Equals(key, "ShadowSungrass", StringComparison.OrdinalIgnoreCase))
+            {
+                executed = ApplyShadowSungrassTemporaryUpgrade(context);
+            }
             else
             {
                 executed = CardExecutor.TryTriggerRelicEffect(OriginalRelicData, timing, context);
@@ -177,6 +199,46 @@ namespace AlmaAscention.Relic
             context.Caster.GainMana(OriginalRelicData.GetIntParam("ManaGain", 0));
             _activatedThisTurn = true;
             return true;
+        }
+
+        private bool ApplyWorldTreeSeedManaBonus(CombatContext context)
+        {
+            if (_turnMaxManaBonus != 0 || context.Caster == null || !context.Caster.IsAlive)
+                return false;
+
+            int bonus = OriginalRelicData.EffectValue > 0 ? OriginalRelicData.EffectValue : 1;
+            context.Caster.ModifyMaxMana(bonus, alsoGainCurrentMana: true);
+            _turnMaxManaOwner = context.Caster;
+            _turnMaxManaBonus = bonus;
+            return true;
+        }
+
+        private bool ApplyShadowSungrassTemporaryUpgrade(CombatContext context)
+        {
+            if (!(context.DeckOps is BattleDeckManager deck) || _turnUpgradedCards.Count > 0)
+                return false;
+
+            var candidates = new List<CardInstance>();
+            foreach (CardInstance card in deck.HandCards)
+            {
+                if (card != null && !card.IsUpgraded)
+                    candidates.Add(card);
+            }
+
+            if (candidates.Count == 0)
+                return false;
+
+            int countToUpgrade = Math.Max(1, OriginalRelicData.EffectValue);
+            for (int i = 0; i < countToUpgrade && candidates.Count > 0; i++)
+            {
+                int pick = UnityEngine.Random.Range(0, candidates.Count);
+                CardInstance chosen = candidates[pick];
+                candidates.RemoveAt(pick);
+                if (chosen.Upgrade())
+                    _turnUpgradedCards.Add(chosen);
+            }
+
+            return _turnUpgradedCards.Count > 0;
         }
 
         private bool ApplyHandCost(CombatContext context)
@@ -274,6 +336,28 @@ namespace AlmaAscention.Relic
                 if (bonus.Owner != null)
                 {
                     bonus.Owner.SetStatus(bonus.StatusId, bonus.Owner.GetStatus(bonus.StatusId) - bonus.Amount);
+                }
+            }
+
+            if (_turnUpgradedCards.Count > 0)
+            {
+                var upgraded = _turnUpgradedCards.ToArray();
+                _turnUpgradedCards.Clear();
+                foreach (var card in upgraded)
+                {
+                    card?.RevertTemporaryUpgrade();
+                }
+            }
+
+            if (_turnMaxManaBonus != 0)
+            {
+                int bonus = _turnMaxManaBonus;
+                StatusController owner = _turnMaxManaOwner;
+                _turnMaxManaBonus = 0;
+                _turnMaxManaOwner = null;
+                if (owner != null)
+                {
+                    owner.ModifyMaxMana(-bonus, alsoGainCurrentMana: false);
                 }
             }
         }

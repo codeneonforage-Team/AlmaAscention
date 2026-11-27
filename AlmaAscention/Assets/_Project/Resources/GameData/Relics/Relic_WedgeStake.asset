@@ -16,7 +16,7 @@ MonoBehaviour:
   - Key: AdditionalStatusIDs
     Value: 
   - Key: BalanceStatus
-    Value: UnspecifiedRarityAndPrice
+    Value: "UnspecifiedRarityAndPrice"
   - Key: Character
     Value: 
   - Key: CooldownTurns
@@ -26,31 +26,31 @@ MonoBehaviour:
   - Key: Duration
     Value: 
   - Key: EffectImplementation
-    Value: Pending
+    Value: "Implemented"
   - Key: FirstTurnOnly
     Value: 
   - Key: ImplementationStatus
-    Value: Deferred
+    Value: 
   - Key: ManaGain
     Value: 
   - Key: PendingRules
-    Value: "\uBC1C\uB3D9 \uC2DC\uC810\uACFC \uBC18\uBCF5\uD560 \uD589\uB3D9 \uD655\uC815 \uD544\uC694"
+    Value: 
   - Key: Target
     Value: 
   - Key: TurnInterval
-    Value: 3
+    Value: "3"
   - Key: ValueSource
     Value: 
   RelicID: WedgeStake
   RelicName: "\uC410\uAE30 \uB9D0\uB69D"
-  Description: "3\uD134\uC5D0 \uD55C \uBC88 \uC801\uB4E4\uC758 \uB2E4\uC74C \uD589\uB3D9\uC744 \uBC18\uBCF5\uC2DC\uD0A8\uB2E4. \uC608: \uACF5\uACA9\uD558\uB824 \uD55C\uB2E4\uBA74 \uB2E4\uC74C \uD134\uC5D0\uB3C4 \uACF5\uACA9\uD558\uAC8C \uB41C\uB2E4."
+  Description: "\uD68D\uB4DD \uD6C4 \uB204\uC801 3\uD134\uB9C8\uB2E4 \uC801\uB4E4\uC758 \uD604\uC7AC \uD589\uB3D9 \uC758\uB3C4\uB97C \uB2E4\uC74C \uD134\uC5D0\uB3C4 \uD55C \uBC88 \uB354 \uBC18\uBCF5\uD558\uAC8C \uACE0\uC815\uD55C\uB2E4."
   FlavorText: "\uBA3C \uC61B\uB0A0 \uAC70\uC778\uC774 \uB300\uB959\uC744 \uB04C\uC5B4\uC11C \uD558\uB098\uB85C \uBAA8\uC744 \uB54C \uC4F4 \uACE0\uC815\uC6A9 \uB9D0\uB69D. \uC7AC\uC9C8\uC740 \uCCA0\uC5D0 \uAC00\uAE4C\uC6B4\uB370 \uB9D0\uB3C4 \uC548 \uB418\uAC8C \uAC00\uBCCD\uB2E4."
   Icon: {fileID: 0}
   Rarity: 1
   ShopPrice: 150
   TriggerType: 3
   EffectKey: WedgeStake
-  EffectValue: 0
+  EffectValue: 1
   StatusID: 
   StatusStacks: 0
   AcquireMaxHealthBonus: 0
